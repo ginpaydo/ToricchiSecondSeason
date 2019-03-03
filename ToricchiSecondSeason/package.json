@@ -1,0 +1,24 @@
+{
+  "name": "toricchi-second-season",
+  "version": "0.0.0",
+  "description": "ToricchiSecondSeason",
+  "main": "app.js",
+  "author": {
+    "name": ""
+  },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha  --recursive"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.6",
+    "@types/node": "^8.0.14",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.1",
+    "ts-node": "^8.0.2"
+  },
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "sqlite3": "^4.0.6",
+    "typeorm": "^0.2.14"
+  }
+}
