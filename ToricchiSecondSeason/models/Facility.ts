@@ -14,7 +14,7 @@ export default class Facility {
     // 名前
     @Column({
         name: 'Name',
-        type: 'string',
+        type: 'text',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -69,7 +69,7 @@ export default class Facility {
     // 説明
     @Column({
         name: 'Comment',
-        type: 'string',
+        type: 'text',
         comment: '説明',
         length: 100,
         default: '何か設定しなさい'

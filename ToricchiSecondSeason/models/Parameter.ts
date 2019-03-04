@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 // Parametersテーブル
@@ -15,7 +14,7 @@ export default class Parameter {
     // 名前
     @Column({
         name: 'Name',
-        type: 'string',
+        type: 'text',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -25,11 +24,12 @@ export default class Parameter {
     // 値
     @Column({
         name: 'Value',
-        type: 'int',
+        type: 'text',
         comment: '値',
-        default: 0
+        length: 50,
+        default: '何か設定しなさい'
     })
-    value: number;
+    value: string;
     
     // 作成日
     @CreateDateColumn({

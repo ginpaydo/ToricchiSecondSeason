@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import Parameter from './Parameter';
 
@@ -25,7 +24,7 @@ export default class ReplyMessage {
     // 応答キーワード
     @Column({
         name: 'Word',
-        type: 'string',
+        type: 'text',
         comment: '応答キーワード',
         length: 100,
         default: '何か設定しなさい'
@@ -44,34 +43,17 @@ export default class ReplyMessage {
     // 応答内容
     @Column({
         name: 'Reply',
-        type: 'string',
+        type: 'text',
         comment: '応答内容',
         length: 200,
         default: '何か設定しなさい'
     })
     reply: string;
     
-    // 消費ステータス
-    @ManyToOne(type => Parameter)
-    status: Parameter;
-    
-    // 消費ポイント
-    @Column({
-        name: 'Cost',
-        type: 'int',
-        comment: '消費ポイント',
-        nullable: true
-    })
-    cost: number;
-    
-    // ポイントが足りないときの応答ID
-    @ManyToOne(type => ReplyMessage)
-    failed: ReplyMessage;
-    
     // 呼び出す関数名
     @Column({
         name: 'Function',
-        type: 'string',
+        type: 'text',
         comment: '呼び出す関数名',
         nullable: true
     })
@@ -89,7 +71,7 @@ export default class ReplyMessage {
     // 説明
     @Column({
         name: 'Comment',
-        type: 'string',
+        type: 'text',
         comment: '説明',
         default: '何か設定しなさい'
     })

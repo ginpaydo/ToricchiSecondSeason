@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 // Charactersテーブル
@@ -12,24 +11,24 @@ export default class Character {
     })
     id: number;
     
-    // 好感度増減値
+    // 名前
     @Column({
         name: 'Name',
-        type: 'string',
-        comment: '好感度増減値',
+        type: 'text',
+        comment: '名前',
         length: 50,
         default: '何か設定しなさい'
     })
-    name: number;
+    name: string;
     
-    // 応答キーワード
+    // 好感度
     @Column({
         name: 'Like',
         type: 'int',
-        comment: '応答キーワード',
-        default: '0'
+        comment: '好感度',
+        default: 0
     })
-    like: string;
+    like: number;
     
     // 作成日
     @CreateDateColumn({

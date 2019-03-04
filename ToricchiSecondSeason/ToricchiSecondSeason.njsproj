@@ -53,6 +53,9 @@
     <TypeScriptCompile Include="DiscordHelper.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="MessageConstants.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="models\Character.ts" />
     <TypeScriptCompile Include="models\Facility.ts" />
     <TypeScriptCompile Include="models\Parameter.ts" />

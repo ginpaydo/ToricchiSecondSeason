@@ -9,8 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
-const Task_1 = require("./models/Task"); // TODO:追加すること
-const Bask_1 = require("./models/Bask");
+const ReplyMessage_1 = require("./models/ReplyMessage");
+const Parameter_1 = require("./models/Parameter");
+const Facility_1 = require("./models/Facility");
+const Character_1 = require("./models/Character");
 class DbStore {
     // 接続（シングルトン）
     static createConnection() {
@@ -30,9 +32,10 @@ DbStore.connectionOptions = {
     type: "sqlite",
     database: `./data/data.sqlite`,
     entities: [
-        // TODO:テーブルクラスを全てここに列挙すること
-        Task_1.default,
-        Bask_1.default
+        Character_1.default,
+        Facility_1.default,
+        Parameter_1.default,
+        ReplyMessage_1.default
     ],
     // Model変更をデータベースのテーブル定義に反映する
     synchronize: true
