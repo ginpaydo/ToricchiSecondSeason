@@ -1,7 +1,5 @@
-﻿import { AppData } from "./AppData";
-import { sendMessageToChannel, modifyNewLineStr, memoryMessage, replaceMessage, evalFunction } from "./DiscordHelper";
-import Parameter from "./models/Parameter";
-import { failedMessage, initialMessage, startupMessage } from "./MessageConstants";
+﻿import { sendMessageToChannel, modifyNewLineStr, memoryMessage, replaceMessage, evalFunction, getParameter, getCharacter, addLike } from "./DiscordHelper";
+import { failedMessage, initialMessage, startupMessage, makeCharacterMessage, dbErrMessage } from "./MessageConstants";
 import ParameterController from "./controllers/ParametersController";
 import ReplyMessageController from "./controllers/ReplyMessagesController";
 'use strict';
@@ -35,7 +33,7 @@ client.on('message', async message => {
     }
     // 最後のメッセージを保持、表示
     memoryMessage(message);
-
+    var isDead = await getParameter("IsDead");
     // メッセージから特定の文字を除外する
     var tempMessage = replaceMessage(message.content);
     if (tempMessage.length > 0) {
@@ -44,17 +42,16 @@ client.on('message', async message => {
 
         // 候補がある場合
         if (candidateList.length > 0) {
-            // TODO:発言者データから現在ポイントを取得
-            var point = 5;  // TODO:仮値
-
-            // ポイントの高い物から判定
+            // 発言者データ取得関数
+            var character = await getCharacter(message);
+            
+            // ポイントの高い物から使用するメッセージを判定
             var messageData = candidateList[0];
             messageData = candidateList.find(function (value) {
-                return !value.requirePointMin || value.requirePointMin <= point;
+                return !value.requirePointMin || value.requirePointMin <= character.like;
             });
 
             // 単純なメッセージ返信
-            console.log(`${messageData.requirePointMin}:${point}`);
             message.channel.send(messageData.reply);
 
             // 関数の動的呼び出し
@@ -66,10 +63,8 @@ client.on('message', async message => {
             // 全て成功したら発言者に好感度加算
             if (success) {
                 if (messageData.friendryPoint) {
-                    console.log(`好感度加算する:${messageData.friendryPoint}`);
+                    await addLike(character, messageData.friendryPoint);
                 }
-            } else {
-                console.log(`好感度加算しない`);
             }
         }
 
@@ -85,7 +80,7 @@ client.login(token);
 /**
  * メッセージ候補を降順で取得する
  * @param messageContent メッセージ本文
- * @returns list メッセージ候補（ポイント降順）
+ * @returns メッセージ候補リスト（ポイント降順）
  */
 async function getCandidateList(messageContent) {
     var candidateList = [];
@@ -108,8 +103,9 @@ async function getCandidateList(messageContent) {
             return 0;
         });
     }).catch((err) => {
+        console.log(dbErrMessage);
+        console.log(err);
     });
     return candidateList;
 
 }
-

@@ -9,6 +9,9 @@ const MessageConstants_1 = require("./MessageConstants");
 function memoryMessage(message) {
     // 最後のメッセージを保存
     exports.lastMessage = message;
+    // TODO:MP回復
+    // TODO:戦闘不能ならばHP回復
+    // TODO:収入加算
     // ログ表示
     console.log(exports.lastMessage.channel.id + " : " + exports.lastMessage.author.username + " : " + exports.lastMessage.content);
     return true;

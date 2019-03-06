@@ -46,5 +46,8 @@ export default class Parameter {
         comment: '更新日'
     })
     readonly updatedAt: Date;
-    
+
+    intValue(): number {
+        return parseInt(this.value);
+    }
 }

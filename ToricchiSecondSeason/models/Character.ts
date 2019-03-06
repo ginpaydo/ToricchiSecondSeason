@@ -5,7 +5,9 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 @Entity("Characters")
 export default class Character {
     // 通し番号
-    @PrimaryGeneratedColumn({
+    // PKだがDiscordIDを使うので自動インクリメントしない
+    @Column({
+        primary: true,
         type: 'int',
         comment: '通し番号'
     })

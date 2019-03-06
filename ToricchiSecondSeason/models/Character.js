@@ -15,7 +15,8 @@ const typeorm_1 = require("typeorm");
 let Character = class Character {
 };
 __decorate([
-    typeorm_1.PrimaryGeneratedColumn({
+    typeorm_1.Column({
+        primary: true,
         type: 'int',
         comment: '通し番号'
     }),

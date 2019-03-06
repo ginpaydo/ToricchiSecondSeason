@@ -12,6 +12,8 @@ const DiscordHelper_1 = require("./DiscordHelper");
 const MessageConstants_1 = require("./MessageConstants");
 const ParametersController_1 = require("./controllers/ParametersController");
 const ReplyMessagesController_1 = require("./controllers/ReplyMessagesController");
+const CharactersController_1 = require("./controllers/CharactersController");
+const Character_1 = require("./models/Character");
 'use strict';
 // 設定項目
 //const token = '<DiscordBOTのトークン>';
@@ -47,15 +49,14 @@ client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
         var candidateList = yield getCandidateList(tempMessage);
         // 候補がある場合
         if (candidateList.length > 0) {
-            // TODO:発言者データから現在ポイントを取得
-            var point = 5; // TODO:仮値
-            // ポイントの高い物から判定
+            // 発言者データ取得関数
+            var character = yield getCharacter(message);
+            // ポイントの高い物から使用するメッセージを判定
             var messageData = candidateList[0];
             messageData = candidateList.find(function (value) {
-                return !value.requirePointMin || value.requirePointMin <= point;
+                return !value.requirePointMin || value.requirePointMin <= character.like;
             });
             // 単純なメッセージ返信
-            console.log(`${messageData.requirePointMin}:${point}`);
             message.channel.send(messageData.reply);
             // 関数の動的呼び出し
             var success = true;
@@ -68,9 +69,6 @@ client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
                     console.log(`好感度加算する:${messageData.friendryPoint}`);
                 }
             }
-            else {
-                console.log(`好感度加算しない`);
-            }
         }
     }
     else {
@@ -82,7 +80,7 @@ client.login(token);
 /**
  * メッセージ候補を降順で取得する
  * @param messageContent メッセージ本文
- * @returns list メッセージ候補（ポイント降順）
+ * @returns メッセージ候補リスト（ポイント降順）
  */
 function getCandidateList(messageContent) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -110,8 +108,59 @@ function getCandidateList(messageContent) {
                 return 0;
             });
         }).catch((err) => {
+            console.log(MessageConstants_1.dbErrMessage);
+            console.log(err);
         });
         return candidateList;
+    });
+}
+/**
+ * 利用者データを取得する
+ * 無ければ作成する
+ * @param message メッセージデータ
+ * @returns 利用者データ
+ */
+function getCharacter(message) {
+    return __awaiter(this, void 0, void 0, function* () {
+        CharactersController_1.default.get(message.author.id).then((character) => {
+            return character;
+        }).catch((err) => {
+            // 無かったので作成
+            console.log(MessageConstants_1.makeCharacterMessage);
+            var newCharacter = new Character_1.default();
+            newCharacter.id = message.author.id;
+            newCharacter.like = 0;
+            newCharacter.name = message.author.username;
+            CharactersController_1.default.add(newCharacter).then((character) => {
+                return character;
+            }).catch((err) => {
+                console.log(MessageConstants_1.dbErrMessage);
+                console.log(err);
+                return null;
+            });
+        });
+        return null;
+    });
+}
+/**
+ * 利用者データに好感度を加算する
+ * @param character 利用者データ
+ * @param like ポイント増分
+ * @returns 利用者データ
+ */
+function addLike(character, like) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // 最小値は-5
+        character.like = Math.max(-5, character.like + like);
+        // 更新
+        CharactersController_1.default.update(character.id, character).then((character) => {
+            return character;
+        }).catch((err) => {
+            console.log(MessageConstants_1.dbErrMessage);
+            console.log(err);
+            return null;
+        });
+        return null;
     });
 }
 //# sourceMappingURL=app.js.map
