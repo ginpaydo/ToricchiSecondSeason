@@ -27,7 +27,7 @@ export default class ReplyMessage {
         type: 'text',
         comment: '応答キーワード',
         length: 100,
-        default: '何か設定しなさい'
+        nullable: true
     })
     word: string;
     

@@ -1,7 +1,8 @@
-﻿import { sendMessageToChannel, modifyNewLineStr, memoryMessage, replaceMessage, evalFunction, getParameter, getCharacter, addLike } from "./DiscordHelper";
+﻿import { memoryMessage, replaceMessage } from "./DiscordHelper";
 import { failedMessage, initialMessage, startupMessage, makeCharacterMessage, dbErrMessage } from "./MessageConstants";
 import ParameterController from "./controllers/ParametersController";
 import ReplyMessageController from "./controllers/ReplyMessagesController";
+import { evalFunction, getParameter, getCharacter, addLike, getParameterNumber } from "./ToricchiHelper";
 'use strict';
 
 // 設定項目
@@ -32,49 +33,52 @@ client.on('message', async message => {
         return;
     }
     // 最後のメッセージを保持、表示
-    memoryMessage(message);
-    var isDead = await getParameter("IsDead");
-    // メッセージから特定の文字を除外する
-    var tempMessage = replaceMessage(message.content);
-    if (tempMessage.length > 0) {
-        // 条件に合ったメッセージを取得
-        var candidateList = await getCandidateList(tempMessage);
+    await memoryMessage(message);
+    // 死んでたら更新処理のみ
+    var isDead = await getParameterNumber("IsDead");
+    if (!isDead) {
+        // メッセージから特定の文字を除外する
+        var tempMessage = replaceMessage(message.content);
+        if (tempMessage.length > 0) {
+            // 条件に合ったメッセージを取得
+            var candidateList = await getCandidateList(tempMessage);
 
-        // 候補がある場合
-        if (candidateList.length > 0) {
-            // 発言者データ取得関数
-            var character = await getCharacter(message);
-            
-            // ポイントの高い物から使用するメッセージを判定
-            var messageData = candidateList[0];
-            messageData = candidateList.find(function (value) {
-                return !value.requirePointMin || value.requirePointMin <= character.like;
-            });
+            // 候補がある場合
+            if (candidateList.length > 0) {
+                // 発言者データ取得関数
+                var character = await getCharacter(message);
 
-            // 単純なメッセージ返信
-            message.channel.send(messageData.reply);
+                // ポイントの高い物から使用するメッセージを判定
+                var messageData = candidateList[0];
+                messageData = candidateList.find(function (value) {
+                    return !value.requirePointMin || value.requirePointMin <= character.like;
+                });
 
-            // 関数の動的呼び出し
-            var success = true;
-            if (messageData.function) {
-                success = evalFunction(messageData.function);
-            }
+                // 単純なメッセージ返信
+                if (messageData.reply) {
+                    message.channel.send(messageData.reply);
+                }
+                // 関数の動的呼び出し
+                var success = true;
+                if (messageData.function) {
+                    success = evalFunction(messageData.function);
+                }
 
-            // 全て成功したら発言者に好感度加算
-            if (success) {
-                if (messageData.friendryPoint) {
-                    await addLike(character, messageData.friendryPoint);
+                // 全て成功したら発言者に好感度加算
+                if (success) {
+                    if (messageData.friendryPoint) {
+                        await addLike(character, messageData.friendryPoint);
+                    }
                 }
             }
+        } else {
+            // 除外した結果何もなくなった
+            message.channel.send(`は？`);
         }
-
-    } else {
-        // 除外した結果何もなくなった
-        message.channel.send(`は？`);
     }
 });
 
-
+// ログイン
 client.login(token);
 
 /**

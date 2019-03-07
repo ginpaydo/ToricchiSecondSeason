@@ -36,7 +36,7 @@ __decorate([
         type: 'text',
         comment: '応答キーワード',
         length: 100,
-        default: '何か設定しなさい'
+        nullable: true
     }),
     __metadata("design:type", String)
 ], ReplyMessage.prototype, "word", void 0);
