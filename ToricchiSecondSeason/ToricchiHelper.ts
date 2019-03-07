@@ -1,18 +1,12 @@
 ﻿// とりっっちに関する処理
-import ParameterController from "./controllers/ParametersController";
 import Parameter from "./models/Parameter";
 import Character from "./models/Character";
 import CharacterController from "./controllers/CharactersController";
 import { makeCharacterMessage, dbErrMessage, failedMessage } from "./MessageConstants";
-import DbStore from "./DbStore";
+import { saveAll, cache } from "./DbStore";
 
 
 // **** とりっっちに関する関数をここに集めておく**** //
-
-// 多分、awaitしてもスレッドが分かれてて競合するので、初期化処理でしゅとくしておくべき
-// とりっっちのパラメータキャッシュ
-var parameterCache = null;
-// TODO:利用者データのキャッシュ
 
 /**
  * 利用者データを取得する
@@ -21,25 +15,18 @@ var parameterCache = null;
  * @returns 利用者データ
  */
 export async function getCharacter(message): Promise<Character> {
-    // 利用者データを探す
-    CharacterController.get(message.author.id).then((character) => {
-        return character;
-    }).catch((err) => {
+    // 探す
+    var result: Character = cache["character"].find(item => item.id === message.author.id);
+    if (!result) {
         // 無かったので作成
-        console.log(makeCharacterMessage);
-        var newCharacter = new Character();
-        newCharacter.id = message.author.id;
-        newCharacter.like = 0;
-        newCharacter.name = message.author.username;
-        CharacterController.add(newCharacter).then((character) => {
-            return character;
-        }).catch((err) => {
-            console.log(dbErrMessage);
-            console.log(err);
-            return null;
-        });
-    });
-    return null;
+        console.log(makeCharacterMessage + message.author.username);
+        result = new Character();
+        result.id = message.author.id;
+        result.like = 0;
+        result.name = message.author.username;
+        cache["character"].push(result);
+    }
+    return result;
 }
 
 /**
@@ -74,7 +61,6 @@ export async function updateToricchi() {
     var income = await getParameterNumber("Income");
     await updateParameter("Money", income);
     // 戦闘不能ならばHP回復
-    console.log("HPを更新します");
     var isDead = await getParameterNumber("IsDead");
     if (isDead) {
         var temp = await updateParameterMax("Hp", "MaxHp", 1);
@@ -104,19 +90,8 @@ export async function updateParameterMax(name, maxName, addValue): Promise<Param
  * @returns 処理後のパラメータ
  */
 export async function getParameter(name): Promise<Parameter> {
-    // シングルトンでキャッシュする
-    if (!parameterCache) {
-        await ParameterController.all().then((val) => {
-            console.log("パラメータをキャッシュします" + name);
-            parameterCache = val;
-        }).catch((err) => {
-            console.log(failedMessage);
-            console.log(err);
-        });
-    }
-    console.log(parameterCache);
     // 探す
-    var result: Parameter = parameterCache.find(item => item.name === name);
+    var result: Parameter = cache["parameter"].find(item => item.name === name);
     return result;
 }
 /**
@@ -169,14 +144,7 @@ export function evalFunction(functionName) {
 function Help() {
 }
 
-// 各テーブルをDBに一括保存する
-async function Save() {
-    var connection = await DbStore.createConnection();
-
-    await connection.transaction(async transactionalEntityManager => {
-        await transactionalEntityManager.save(parameterCache);
-        //await transactionalEntityManager.save(photos);
-
-    });
-
+// 各テーブルをDBに一括保存する（削除はしない）
+function Save() {
+    saveAll();
 }

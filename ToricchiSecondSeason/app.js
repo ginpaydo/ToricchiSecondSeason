@@ -13,6 +13,7 @@ const MessageConstants_1 = require("./MessageConstants");
 const ParametersController_1 = require("./controllers/ParametersController");
 const ReplyMessagesController_1 = require("./controllers/ReplyMessagesController");
 const ToricchiHelper_1 = require("./ToricchiHelper");
+const DbStore_1 = require("./DbStore");
 'use strict';
 // 設定項目
 //const token = '<DiscordBOTのトークン>';
@@ -25,13 +26,16 @@ client.on('ready', () => {
     // と言っても特に何もしていなくて、一旦DBにアクセスすることでテーブル作成しているだけ。
     var w = ParametersController_1.default.all().then((parameter) => {
         if (parameter.length == 0) {
-            console.log(`${MessageConstants_1.initialMessage}`);
+            console.log(MessageConstants_1.initialMessage);
         }
     }).catch((err) => {
         console.log(`${MessageConstants_1.failedMessage} ${err.message}`);
     });
+    // データベースのデータをキャッシュする
+    console.log(MessageConstants_1.cacheMessage);
+    DbStore_1.initialize();
     // 完了メッセージ
-    console.log(`${MessageConstants_1.startupMessage}`);
+    console.log(MessageConstants_1.startupMessage);
 });
 // メッセージの受信
 client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {

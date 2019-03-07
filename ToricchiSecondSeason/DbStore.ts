@@ -3,6 +3,10 @@ import ReplyMessage from './models/ReplyMessage';
 import Parameter from './models/Parameter';
 import Facility from './models/Facility';
 import Character from './models/Character';
+import ReplyMessageController from './controllers/ReplyMessagesController';
+import FacilityController from './controllers/FacilitiesController';
+import ParameterController from './controllers/ParametersController';
+import CharacterController from './controllers/CharactersController';
 
 export default class DbStore {
     private static _conn: Connection;
@@ -31,4 +35,28 @@ export default class DbStore {
         }
         return this._conn;
     }
+}
+
+// とりっっちのデータキャッシュ
+export var cache = {};
+
+// 各テーブルをキャッシュする
+export async function initialize() {
+    await CharacterController.all().then((val) => { cache["character"] = val; });
+    await ParameterController.all().then((val) => { cache["parameter"] = val; });
+    await FacilityController.all().then((val) => { cache["facility"] = val; });
+    await ReplyMessageController.all().then((val) => { cache["replyMessage"] = val; });
+}
+
+// 各テーブルをDBに一括保存する（削除はしない）
+export async function saveAll() {
+    var connection = await DbStore.createConnection();
+    
+    // 各テーブルの保存
+    await connection.transaction(async transactionalEntityManager => {
+        Object.keys(cache).forEach(async function (key) {
+            var val = this[key]; // this は obj
+            await transactionalEntityManager.save(val);
+        }, cache);
+    });
 }

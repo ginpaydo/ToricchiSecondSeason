@@ -8,17 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// とりっっちに関する処理
-const ParametersController_1 = require("./controllers/ParametersController");
 const Character_1 = require("./models/Character");
 const CharactersController_1 = require("./controllers/CharactersController");
 const MessageConstants_1 = require("./MessageConstants");
 const DbStore_1 = require("./DbStore");
 // **** とりっっちに関する関数をここに集めておく**** //
-// 多分、awaitしてもスレッドが分かれてて競合するので、初期化処理でしゅとくしておくべき
-// とりっっちのパラメータキャッシュ
-var parameterCache = null;
-// TODO:利用者データのキャッシュ
+//var parameterCache = null;
+//// 利用者データのキャッシュ
+//var characterCache = null;
 /**
  * 利用者データを取得する
  * 無ければ作成する
@@ -27,25 +24,18 @@ var parameterCache = null;
  */
 function getCharacter(message) {
     return __awaiter(this, void 0, void 0, function* () {
-        // 利用者データを探す
-        CharactersController_1.default.get(message.author.id).then((character) => {
-            return character;
-        }).catch((err) => {
+        // 探す
+        var result = DbStore_1.cache["character"].find(item => item.id === message.author.id);
+        if (!result) {
             // 無かったので作成
-            console.log(MessageConstants_1.makeCharacterMessage);
-            var newCharacter = new Character_1.default();
-            newCharacter.id = message.author.id;
-            newCharacter.like = 0;
-            newCharacter.name = message.author.username;
-            CharactersController_1.default.add(newCharacter).then((character) => {
-                return character;
-            }).catch((err) => {
-                console.log(MessageConstants_1.dbErrMessage);
-                console.log(err);
-                return null;
-            });
-        });
-        return null;
+            console.log(MessageConstants_1.makeCharacterMessage + message.author.username);
+            result = new Character_1.default();
+            result.id = message.author.id;
+            result.like = 0;
+            result.name = message.author.username;
+            DbStore_1.cache["character"].push(result);
+        }
+        return result;
     });
 }
 exports.getCharacter = getCharacter;
@@ -83,7 +73,6 @@ function updateToricchi() {
         var income = yield getParameterNumber("Income");
         yield updateParameter("Money", income);
         // 戦闘不能ならばHP回復
-        console.log("HPを更新します");
         var isDead = yield getParameterNumber("IsDead");
         if (isDead) {
             var temp = yield updateParameterMax("Hp", "MaxHp", 1);
@@ -118,19 +107,8 @@ exports.updateParameterMax = updateParameterMax;
  */
 function getParameter(name) {
     return __awaiter(this, void 0, void 0, function* () {
-        // シングルトンでキャッシュする
-        if (!parameterCache) {
-            yield ParametersController_1.default.all().then((val) => {
-                console.log("パラメータをキャッシュします" + name);
-                parameterCache = val;
-            }).catch((err) => {
-                console.log(MessageConstants_1.failedMessage);
-                console.log(err);
-            });
-        }
-        console.log(parameterCache);
         // 探す
-        var result = parameterCache.find(item => item.name === name);
+        var result = DbStore_1.cache["parameter"].find(item => item.name === name);
         return result;
     });
 }
@@ -148,7 +126,7 @@ function getParameterNumber(name) {
 }
 exports.getParameterNumber = getParameterNumber;
 /**
- * ステータスを更新する
+ * ステータスを更新する（保存はしない）
  * @param name パラメータ名
  * @param addValue 加算値
  * @param max 最大値、なければ判定なし、0の時は判定されない
@@ -165,11 +143,8 @@ function updateParameter(name, addValue, max = 0) {
         else {
             tempParameter.value = (Number(tempParameter.value) + addValue).toString();
         }
-        //// 保存
-        //return await ParameterController.update(tempParameter.id, tempParameter);
-        console.log("更新しました");
-        console.log(tempParameter);
-        return tempParameter; //////TODO:
+        // 保存
+        return tempParameter;
     });
 }
 exports.updateParameter = updateParameter;
@@ -191,14 +166,8 @@ function evalFunction(functionName) {
 exports.evalFunction = evalFunction;
 function Help() {
 }
-// 各テーブルをDBに一括保存する
+// 各テーブルをDBに一括保存する（削除はしない）
 function Save() {
-    return __awaiter(this, void 0, void 0, function* () {
-        var connection = yield DbStore_1.default.createConnection();
-        yield connection.transaction((transactionalEntityManager) => __awaiter(this, void 0, void 0, function* () {
-            yield transactionalEntityManager.save(parameterCache);
-            //await transactionalEntityManager.save(photos);
-        }));
-    });
+    DbStore_1.saveAll();
 }
 //# sourceMappingURL=ToricchiHelper.js.map

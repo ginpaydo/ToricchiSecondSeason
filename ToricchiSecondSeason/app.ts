@@ -1,8 +1,9 @@
 ﻿import { memoryMessage, replaceMessage } from "./DiscordHelper";
-import { failedMessage, initialMessage, startupMessage, makeCharacterMessage, dbErrMessage } from "./MessageConstants";
+import { failedMessage, initialMessage, startupMessage, dbErrMessage, cacheMessage } from "./MessageConstants";
 import ParameterController from "./controllers/ParametersController";
 import ReplyMessageController from "./controllers/ReplyMessagesController";
-import { evalFunction, getParameter, getCharacter, addLike, getParameterNumber } from "./ToricchiHelper";
+import { evalFunction, getCharacter, addLike, getParameterNumber } from "./ToricchiHelper";
+import { initialize } from "./DbStore";
 'use strict';
 
 // 設定項目
@@ -16,14 +17,18 @@ client.on('ready', () => {
     // と言っても特に何もしていなくて、一旦DBにアクセスすることでテーブル作成しているだけ。
     var w = ParameterController.all().then((parameter) => {
         if (parameter.length == 0) {
-            console.log(`${initialMessage}`);
+            console.log(initialMessage);
         }
     }).catch((err) => {
         console.log(`${failedMessage} ${err.message}`);
-    });
+        });
+
+    // データベースのデータをキャッシュする
+    console.log(cacheMessage);
+    initialize();
 
     // 完了メッセージ
-    console.log(`${startupMessage}`);
+    console.log(startupMessage);
 });
 
 // メッセージの受信

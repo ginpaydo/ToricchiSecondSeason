@@ -17,8 +17,9 @@ let Character = class Character {
 __decorate([
     typeorm_1.Column({
         primary: true,
-        type: 'int',
-        comment: '通し番号'
+        type: 'text',
+        comment: 'DiscordID',
+        length: 20,
     }),
     __metadata("design:type", Number)
 ], Character.prototype, "id", void 0);

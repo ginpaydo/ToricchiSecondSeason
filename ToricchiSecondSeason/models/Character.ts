@@ -8,8 +8,9 @@ export default class Character {
     // PKだがDiscordIDを使うので自動インクリメントしない
     @Column({
         primary: true,
-        type: 'int',
-        comment: '通し番号'
+        type: 'text',
+        comment: 'DiscordID',
+        length: 20,
     })
     id: number;
     
