@@ -19,4 +19,7 @@ export const makeCharacterMessage = 'この利用者が見つかりませんで�
 export const dbErrMessage = 'データベース処理に失敗しました。';
 
 // メッセージ判定の時に除外する文字リスト
-export const trimList = [ ' ', '、', ',', '。', '\n', '　', '・', '･', '.' ];
+export const trimList = [' ', '、', ',', '。', '\n', '　', '・', '･', '.'];
+
+// ヘルプ表示の時に除外する文字リスト
+export const helpTrimList = ['^', '$'];

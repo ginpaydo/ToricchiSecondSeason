@@ -9,13 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Character_1 = require("./models/Character");
-const CharactersController_1 = require("./controllers/CharactersController");
 const MessageConstants_1 = require("./MessageConstants");
 const DbStore_1 = require("./DbStore");
+const DiscordHelper_1 = require("./DiscordHelper");
 // **** とりっっちに関する関数をここに集めておく**** //
-//var parameterCache = null;
-//// 利用者データのキャッシュ
-//var characterCache = null;
 /**
  * 利用者データを取得する
  * 無ければ作成する
@@ -49,15 +46,6 @@ function addLike(character, like) {
     return __awaiter(this, void 0, void 0, function* () {
         // 最小値は-5
         character.like = Math.max(-5, character.like + like);
-        // 更新
-        CharactersController_1.default.update(character.id, character).then((character) => {
-            return character;
-        }).catch((err) => {
-            console.log(MessageConstants_1.dbErrMessage);
-            console.log(err);
-            return null;
-        });
-        return null;
     });
 }
 exports.addLike = addLike;
@@ -164,10 +152,32 @@ function evalFunction(functionName) {
     }
 }
 exports.evalFunction = evalFunction;
+// コマンド説明
 function Help() {
 }
 // 各テーブルをDBに一括保存する（削除はしない）
 function Save() {
     DbStore_1.saveAll();
+}
+// 
+function Inventory() {
+}
+// 
+function BuyItem() {
+}
+// 
+function Status() {
+}
+// 
+function Shoottori() {
+}
+// 
+function DigitalMegaFlare() {
+}
+// 
+function Unko() {
+    DiscordHelper_1.lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
+    // Unkoを50引く
+    return true;
 }
 //# sourceMappingURL=ToricchiHelper.js.map

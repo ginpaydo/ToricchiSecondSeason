@@ -47,25 +47,13 @@ DbStore.connectionOptions = {
 exports.default = DbStore;
 // とりっっちのデータキャッシュ
 exports.cache = {};
-//export var characterCache = null;
-//export var parameterCache = null;
-//export var facilityCache = null;
-//export var replyMessageCache = null;
 // 各テーブルをキャッシュする
 function initialize() {
     return __awaiter(this, void 0, void 0, function* () {
-        yield CharactersController_1.default.all().then((val) => {
-            exports.cache["character"] = val;
-        });
-        yield ParametersController_1.default.all().then((val) => {
-            exports.cache["parameter"] = val;
-        });
-        yield FacilitiesController_1.default.all().then((val) => {
-            exports.cache["facility"] = val;
-        });
-        yield ReplyMessagesController_1.default.all().then((val) => {
-            exports.cache["replyMessage"] = val;
-        });
+        yield CharactersController_1.default.all().then((val) => { exports.cache["character"] = val; });
+        yield ParametersController_1.default.all().then((val) => { exports.cache["parameter"] = val; });
+        yield FacilitiesController_1.default.all().then((val) => { exports.cache["facility"] = val; });
+        yield ReplyMessagesController_1.default.all().then((val) => { exports.cache["replyMessage"] = val; });
     });
 }
 exports.initialize = initialize;
@@ -81,8 +69,6 @@ function saveAll() {
                     yield transactionalEntityManager.save(val);
                 });
             }, exports.cache);
-            //await transactionalEntityManager.save(parameterCache);
-            //await transactionalEntityManager.save(characterCache);
         }));
     });
 }

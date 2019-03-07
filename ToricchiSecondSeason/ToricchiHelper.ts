@@ -1,9 +1,9 @@
 ﻿// とりっっちに関する処理
 import Parameter from "./models/Parameter";
 import Character from "./models/Character";
-import CharacterController from "./controllers/CharactersController";
 import { makeCharacterMessage, dbErrMessage, failedMessage } from "./MessageConstants";
 import { saveAll, cache } from "./DbStore";
+import { lastMessage } from "./DiscordHelper";
 
 
 // **** とりっっちに関する関数をここに集めておく**** //
@@ -35,19 +35,9 @@ export async function getCharacter(message): Promise<Character> {
  * @param like ポイント増分
  * @returns 利用者データ
  */
-export async function addLike(character, like): Promise<Character> {
+export async function addLike(character, like) {
     // 最小値は-5
     character.like = Math.max(-5, character.like + like);
-
-    // 更新
-    CharacterController.update(character.id, character).then((character) => {
-        return character;
-    }).catch((err) => {
-        console.log(dbErrMessage);
-        console.log(err);
-        return null;
-    });
-    return null;
 }
 
 /**
@@ -141,6 +131,7 @@ export function evalFunction(functionName) {
     }
 }
 
+// コマンド説明
 function Help() {
 }
 
@@ -148,3 +139,32 @@ function Help() {
 function Save() {
     saveAll();
 }
+
+// 
+function Inventory() {
+}
+
+// 
+function BuyItem() {
+}
+
+// 
+function Status() {
+}
+
+// 
+function Shoottori() {
+}
+
+// 
+function DigitalMegaFlare() {
+}
+
+// 
+function Unko() {
+    lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
+    // Unkoを50引く
+    return true;
+}
+
+

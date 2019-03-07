@@ -46,7 +46,7 @@ export default class ReplyMessage {
         type: 'text',
         comment: '応答内容',
         length: 200,
-        default: '何か設定しなさい'
+        nullable: true
     })
     reply: string;
     

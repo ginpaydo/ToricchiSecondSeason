@@ -12,10 +12,10 @@ const token = '<DiscordBOTのトークン>';
 //ログイン処理
 const Discord = require('discord.js');
 const client = new Discord.Client();
-client.on('ready', () => {
+client.on('ready', async () => {
     // 初期状態チェック
     // と言っても特に何もしていなくて、一旦DBにアクセスすることでテーブル作成しているだけ。
-    var w = ParameterController.all().then((parameter) => {
+    await ParameterController.all().then((parameter) => {
         if (parameter.length == 0) {
             console.log(initialMessage);
         }

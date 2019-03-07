@@ -40,9 +40,6 @@
     <Content Include="tablecsv\とりっっち：応答メッセージ.csv" />
     <Content Include="tablecsv\とりっっち：購入物情報.csv" />
     <Content Include="tsconfig.json" />
-    <TypeScriptCompile Include="AppData.ts">
-      <SubType>Code</SubType>
-    </TypeScriptCompile>
     <TypeScriptCompile Include="controllers\CharactersController.ts" />
     <TypeScriptCompile Include="controllers\FacilitiesController.ts" />
     <TypeScriptCompile Include="controllers\ParametersController.ts" />

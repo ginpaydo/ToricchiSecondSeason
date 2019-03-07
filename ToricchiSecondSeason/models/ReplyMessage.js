@@ -55,7 +55,7 @@ __decorate([
         type: 'text',
         comment: '応答内容',
         length: 200,
-        default: '何か設定しなさい'
+        nullable: true
     }),
     __metadata("design:type", String)
 ], ReplyMessage.prototype, "reply", void 0);

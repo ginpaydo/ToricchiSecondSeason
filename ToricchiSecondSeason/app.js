@@ -21,10 +21,10 @@ const token = 'NDE3ODkyMzU0NDgyMjQxNTQ2.D1P4aA.vTlIbi0U9qltG_zzfHoKNi1RCVk';
 //ログイン処理
 const Discord = require('discord.js');
 const client = new Discord.Client();
-client.on('ready', () => {
+client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
     // 初期状態チェック
     // と言っても特に何もしていなくて、一旦DBにアクセスすることでテーブル作成しているだけ。
-    var w = ParametersController_1.default.all().then((parameter) => {
+    yield ParametersController_1.default.all().then((parameter) => {
         if (parameter.length == 0) {
             console.log(MessageConstants_1.initialMessage);
         }
@@ -36,7 +36,7 @@ client.on('ready', () => {
     DbStore_1.initialize();
     // 完了メッセージ
     console.log(MessageConstants_1.startupMessage);
-});
+}));
 // メッセージの受信
 client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
     //Bot自身の発言を無視する
