@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import Parameter from './Parameter';
 
 // ReplyMessagesテーブル
 // 応答メッセージ

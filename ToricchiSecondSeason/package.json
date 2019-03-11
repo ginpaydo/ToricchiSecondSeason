@@ -11,13 +11,14 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.6",
-    "@types/node": "^8.0.14",
+    "@types/node": "^8.10.43",
     "chai": "^4.2.0",
-    "mocha": "^6.0.1",
-    "ts-node": "^8.0.2"
+    "mocha": "^6.0.2",
+    "ts-node": "^8.0.3"
   },
   "dependencies": {
     "discord.js": "^11.4.2",
+    "reflect-metadata": "^0.1.13",
     "sqlite3": "^4.0.6",
     "typeorm": "^0.2.14"
   }

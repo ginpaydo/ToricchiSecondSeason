@@ -18,8 +18,17 @@ export const makeCharacterMessage = 'この利用者が見つかりませんで�
 // DB関連エラーメッセージ
 export const dbErrMessage = 'データベース処理に失敗しました。';
 
+// その他、システム定義
+
 // メッセージ判定の時に除外する文字リスト
 export const trimList = [' ', '、', ',', '。', '\n', '　', '・', '･', '.'];
 
 // ヘルプ表示の時に除外する文字リスト
 export const helpTrimList = ['^', '$'];
+
+// デフォルトBOT名
+export const defaultBotName1 = "とり";
+export const defaultBotName2 = "っ";
+export const defaultBotName3 = "ち";
+
+

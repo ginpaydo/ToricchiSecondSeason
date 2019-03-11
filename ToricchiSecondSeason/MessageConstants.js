@@ -13,8 +13,13 @@ exports.startupMessage = '起動しました。';
 exports.makeCharacterMessage = 'この利用者が見つかりませんでした。データを作成します。:';
 // DB関連エラーメッセージ
 exports.dbErrMessage = 'データベース処理に失敗しました。';
+// その他、システム定義
 // メッセージ判定の時に除外する文字リスト
 exports.trimList = [' ', '、', ',', '。', '\n', '　', '・', '･', '.'];
 // ヘルプ表示の時に除外する文字リスト
 exports.helpTrimList = ['^', '$'];
+// デフォルトBOT名
+exports.defaultBotName1 = "とり";
+exports.defaultBotName2 = "っ";
+exports.defaultBotName3 = "ち";
 //# sourceMappingURL=MessageConstants.js.map

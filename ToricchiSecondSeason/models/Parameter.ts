@@ -30,7 +30,25 @@ export default class Parameter {
         default: '何か設定しなさい'
     })
     value: string;
-    
+
+    // 好感度による表示
+    @Column({
+        name: 'VisibleLevel',
+        type: 'int',
+        comment: '好感度による表示',
+        default: 0
+    })
+    visibleLevel: number;
+
+    // 表示するパラメータ名
+    @Column({
+        name: 'Display',
+        type: 'text',
+        comment: '表示するパラメータ名',
+        default: '何か設定しなさい'
+    })
+    display: string;
+
     // 作成日
     @CreateDateColumn({
         name: 'CreatedAt',
@@ -38,7 +56,7 @@ export default class Parameter {
         comment: '作成日'
     })
     readonly createdAt: Date;
-    
+
     // 更新日
     @UpdateDateColumn({
         name: 'UpdatedAt',

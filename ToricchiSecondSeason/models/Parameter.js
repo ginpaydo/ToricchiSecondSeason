@@ -42,6 +42,24 @@ __decorate([
     __metadata("design:type", String)
 ], Parameter.prototype, "value", void 0);
 __decorate([
+    typeorm_1.Column({
+        name: 'VisibleLevel',
+        type: 'int',
+        comment: '好感度による表示',
+        default: 0
+    }),
+    __metadata("design:type", Number)
+], Parameter.prototype, "visibleLevel", void 0);
+__decorate([
+    typeorm_1.Column({
+        name: 'Display',
+        type: 'text',
+        comment: '表示するパラメータ名',
+        default: '何か設定しなさい'
+    }),
+    __metadata("design:type", String)
+], Parameter.prototype, "display", void 0);
+__decorate([
     typeorm_1.CreateDateColumn({
         name: 'CreatedAt',
         type: 'date',

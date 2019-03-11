@@ -1,9 +1,11 @@
-﻿import { memoryMessage, replaceMessage } from "./DiscordHelper";
-import { failedMessage, initialMessage, startupMessage, dbErrMessage, cacheMessage } from "./MessageConstants";
+﻿import "reflect-metadata";
+import { memoryMessage, replaceMessage } from "./DiscordHelper";
+import { failedMessage, initialMessage, startupMessage, cacheMessage, defaultBotName1, defaultBotName2, defaultBotName3 } from "./MessageConstants";
 import ParameterController from "./controllers/ParametersController";
-import ReplyMessageController from "./controllers/ReplyMessagesController";
-import { evalFunction, getCharacter, addLike, getParameterNumber } from "./ToricchiHelper";
-import { initialize } from "./DbStore";
+import { evalFunction, getCharacter, addLike, getParameterNumber, correctMessage, getParameter } from "./ToricchiHelper";
+import { initialize, cache, saveAll } from "./DbStore";
+import { shopping } from "./Shop";
+import Parameter from "./models/Parameter";
 'use strict';
 
 // 設定項目
@@ -14,10 +16,21 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 client.on('ready', async () => {
     // 初期状態チェック
-    // と言っても特に何もしていなくて、一旦DBにアクセスすることでテーブル作成しているだけ。
     await ParameterController.all().then((parameter) => {
         if (parameter.length == 0) {
+            // 初期化する
             console.log(initialMessage);
+            makeParameter("Name", "とりっち", 1, "なまえ");
+            makeParameter("MaxHp", "100", 2, "最大HP");
+            makeParameter("MaxMp", "100", 2, "最大MP");
+            makeParameter("MaxUnko", "100", 99, "最大値");
+            makeParameter("Hp", "100", 1, "HP");
+            makeParameter("Mp", "50", 1, "MP");
+            makeParameter("Unko", "50", 99, "現在の鬱憤");
+            makeParameter("Money", "10000", 2, "資金");
+            makeParameter("Income", "1", 2, "収入");
+            makeParameter("IsDead", "0", 99, "死んでいるか");
+            makeParameter("Death", "0", 99, "死亡回数");
         }
     }).catch((err) => {
         console.log(`${failedMessage} ${err.message}`);
@@ -31,55 +44,118 @@ client.on('ready', async () => {
     console.log(startupMessage);
 });
 
+/**
+ * とりっちの名前変更
+ * @param newname
+ */
+export function setBotName(newname) {
+    console.log("名前変更：" + newname)
+    if (id) {
+        client.fetchUser(id).then((value) => {
+            value.setUsername(newname);
+            var name = getParameter("Name");
+            name.value = newname;
+            value.lastMessage.member.setNickname(newname).catch(() => { console.log("名前変更失敗") });
+        });
+    }
+}
+
+// パラメータを追加する
+function makeParameter(name: string, value: string, visibleLevel: number, display: string) {
+    var parameter = new Parameter();
+    parameter.value = value;
+    parameter.name = name;
+    parameter.visibleLevel = visibleLevel;
+    parameter.display = display;
+    cache["parameter"].push(parameter);
+}
+
+// 前回の時刻
+var preHour = 0;
+// とりっちのID
+var id = null;
 // メッセージの受信
-client.on('message', async message => {
+client.on('message', message => {
+
     //Bot自身の発言を無視する
     if (message.author.bot) {
-        return;
-    }
-    // 最後のメッセージを保持、表示
-    await memoryMessage(message);
-    // 死んでたら更新処理のみ
-    var isDead = await getParameterNumber("IsDead");
-    if (!isDead) {
-        // メッセージから特定の文字を除外する
-        var tempMessage = replaceMessage(message.content);
-        if (tempMessage.length > 0) {
-            // 条件に合ったメッセージを取得
-            var candidateList = await getCandidateList(tempMessage);
+        if (!id) {
+            var paramId = getParameter("BotUserId");
+            var name = getParameter("Name");
+            if (paramId) {
+                id = paramId.value;
+                console.log(name.value + "のIDは" + id);
+            } else {
+                // 初回起動
+                if (name.value === message.author.username) {
+                    makeParameter("BotUserId", message.author.id, 99, "BOTのID");
+                    console.log(name.value + "のIDは" + message.author.id);
+                    id = message.author.id;
 
-            // 候補がある場合
-            if (candidateList.length > 0) {
-                // 発言者データ取得関数
-                var character = await getCharacter(message);
-
-                // ポイントの高い物から使用するメッセージを判定
-                var messageData = candidateList[0];
-                messageData = candidateList.find(function (value) {
-                    return !value.requirePointMin || value.requirePointMin <= character.like;
-                });
-
-                // 単純なメッセージ返信
-                if (messageData.reply) {
-                    message.channel.send(messageData.reply);
-                }
-                // 関数の動的呼び出し
-                var success = true;
-                if (messageData.function) {
-                    success = evalFunction(messageData.function);
-                }
-
-                // 全て成功したら発言者に好感度加算
-                if (success) {
-                    if (messageData.friendryPoint) {
-                        await addLike(character, messageData.friendryPoint);
+                    if (name.value === defaultBotName1 + defaultBotName2 + defaultBotName3) {
+                        makeParameter("IsToricchi", "1", 99, "とりっちモード");
                     }
                 }
             }
-        } else {
-            // 除外した結果何もなくなった
-            message.channel.send(`は？`);
         }
+        return;
+    }
+
+    // 最後のメッセージを保持、表示
+    memoryMessage(message);
+    // 死んでたら更新処理のみ
+    var isDead = getParameterNumber("IsDead");
+    if (!isDead) {
+        // メッセージから特定の文字を除外する
+        var tempMessage = replaceMessage(message.content);
+
+        if (!shopping()) {
+            // 買い物ではない場合
+            if (tempMessage.length > 0) {
+                // 条件に合ったメッセージを取得
+                var candidateList = getCandidateList(tempMessage);
+
+                // 候補がある場合
+                if (candidateList.length > 0) {
+                    // 発言者データ取得関数
+                    var character = getCharacter(message);
+
+                    // ポイントの高い物から使用するメッセージを判定
+                    var messageData = candidateList.find(function (value) {
+                        return !value.requirePointMin || value.requirePointMin <= character.like;
+                    });
+
+                    // 単純なメッセージ返信
+                    if (messageData.reply) {
+                        var mes = correctMessage(messageData.reply);
+                        message.channel.send(mes);
+                    }
+                    // 関数の動的呼び出し
+                    var success = true;
+                    if (messageData.function) {
+                        success = evalFunction(messageData.function);
+                    }
+                    // 全て成功したら発言者に好感度加算
+                    if (success) {
+                        if (messageData.friendlyPoint) {
+                            addLike(character, messageData.friendlyPoint);
+                        }
+                    }
+                }
+            } else {
+                // 除外した結果何もなくなった
+                message.channel.send(`は？`);
+            }
+        }
+    }
+
+    // 1時間ごとに保存
+    var now = new Date();
+    var hour = now.getHours();
+    if (hour !== preHour) {
+        preHour = hour;
+        saveAll();
+        console.log("保存しました");
     }
 });
 
@@ -91,29 +167,25 @@ client.login(token);
  * @param messageContent メッセージ本文
  * @returns メッセージ候補リスト（ポイント降順）
  */
-async function getCandidateList(messageContent) {
+function getCandidateList(messageContent) {
     var candidateList = [];
-    // メッセージ一覧を取得（完了まで待つ）
-    await ReplyMessageController.all().then((messageList) => {
-        // 条件に合ったメッセージを集める
-        messageList.forEach((value) => {
-            if (messageContent.match(new RegExp(value.word, 'g'))) {
-                candidateList.push(value);
-            }
-        });
+    // メッセージ一覧を取得
 
-        // 降順に並び変える
-        candidateList.sort(function (a, b) {
-            if (a == null && b == null) return 0;
-            if (a == null) return 1;
-            if (b == null) return -1;
-            if (a.requirePointMin < b.requirePointMin) return 1;
-            if (a.requirePointMin > b.requirePointMin) return -1;
-            return 0;
-        });
-    }).catch((err) => {
-        console.log(dbErrMessage);
-        console.log(err);
+    // 条件に合ったメッセージを集める
+    cache["replyMessage"].forEach((value) => {
+        if (messageContent.match(new RegExp(value.word, 'g'))) {
+            candidateList.push(value);
+        }
+    });
+
+    // 降順に並び変える
+    candidateList.sort(function (a, b) {
+        if (a.requirePointMin == null && b.requirePointMin == null) return 0;
+        if (a.requirePointMin == null) return 1;
+        if (b.requirePointMin == null) return -1;
+        if (a.requirePointMin < b.requirePointMin) return 1;
+        if (a.requirePointMin > b.requirePointMin) return -1;
+        return 0;
     });
     return candidateList;
 
