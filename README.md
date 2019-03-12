@@ -1,0 +1,2 @@
+# ToricchiSecondSeason
+DiscordBOT製作第二期、TypeScript製
