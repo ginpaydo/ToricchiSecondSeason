@@ -1,5 +1,5 @@
 # ToricchiSecondSeason
-DiscordBOT製作第二期、TypeScript製
+DiscordBOT製作第二期、TypeScript製  
 ![ToricchiSecondSeason](https://user-images.githubusercontent.com/39305262/54169110-c287ea00-44b4-11e9-80db-ceb1c9bde233.png "ToricchiSecondSeason")
 ## はじめに
 殆ど自分の勉強用プロジェクトなので、一般利用者が動作させるには色々と不十分です。
@@ -21,7 +21,7 @@ PowreShell等を使って、nexeをグローバルでインストールする。
 ```
 npm i -g nexe@next
 ```
-ビルドして、nexeでパッケージングする。
+ビルドして、nexeでパッケージングする。  
 app.tsがあるディレクトリまで移動して、
 ```
 nexe app.js
@@ -29,9 +29,9 @@ nexe app.js
 ※app.tsだとexe起動できない。
 
 この3つを任意のディレクトリに移動する。
-・app.exe
-・dataフォルダ
-・node_modulesフォルダ
+* app.exe
+* dataフォルダ
+* node_modulesフォルダ
 
 ### 使用方法
 exe実行したらプロンプト画面が出てくるので、そのままにしておく。
@@ -57,5 +57,5 @@ DiscordにBOTを追加する。
 
 ## 課題
 * [致命的な課題はこちら](https://github.com/ginpaydo/ToricchiSecondSeason/issues)
-・各種ハードコードの外部データ化（文字列、好感度による条件分岐）
-・グローバル領域に散らかっている関数のクラス化
+* 各種ハードコードの外部データ化（文字列、好感度による条件分岐）
+* グローバル領域に散らかっている関数のクラス化
