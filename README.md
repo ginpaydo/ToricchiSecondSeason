@@ -54,3 +54,8 @@ DiscordにBOTを追加する。
 このプロジェクトへの[貢献者](https://github.com/ginpaydo/ToricchiSecondSeason/contributors)のリストもご覧ください。
 ## ライセンス
 このプロジェクトは MIT ライセンスの元にライセンスされています。 詳細は[LICENSE.md](LICENSE.md)をご覧ください。
+
+## 課題
+* [致命的な課題はこちら](https://github.com/ginpaydo/ToricchiSecondSeason/issues)
+・各種ハードコードの外部データ化（文字列、好感度による条件分岐）
+・グローバル領域に散らかっている関数のクラス化
