@@ -4,12 +4,12 @@ DiscordBOT製作第二期、TypeScript製
 ## はじめに
 殆ど自分の勉強用プロジェクトなので、一般利用者が動作させるには色々と不十分です。
 ### 前提条件
-javascript(node.js)が動作する環境ならば動かせるはず。
+javascript(node.js)が動作する環境ならば動かせるはず。  
 Discord用BOTなので、[Discord開発者用ページ](https://discordapp.com/developers/applications/) でトークンを作成しておく必要あり。
 
 ### インストール方法
-インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。
-app.ts(app.js)をエントリーポイントに起動すれば動作する。
+インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。  
+app.ts(app.js)をエントリーポイントに起動すれば動作する。  
 ビルドする前に、app.ts内の以下の部分にDiscord開発者用ページで作成したトークンを書く。
 ```
 // 設定項目
@@ -22,7 +22,7 @@ PowreShell等を使って、nexeをグローバルでインストールする。
 npm i -g nexe@next
 ```
 ビルドして、nexeでパッケージングする。  
-app.tsがあるディレクトリまで移動して、
+app.tsがあるディレクトリまで移動して以下を実行する。
 ```
 nexe app.js
 ```
@@ -34,7 +34,7 @@ nexe app.js
 * node_modulesフォルダ
 
 ### 使用方法
-exe実行したらプロンプト画面が出てくるので、そのままにしておく。
+exe実行したらプロンプト画面が出てくるので、そのままにしておく。  
 DiscordにBOTを追加する。
 （https://discordapp.com/oauth2/authorize?client_id=<Discord開発者用ページで取得したクライアントID>&scope=bot&permissions=0）
 
