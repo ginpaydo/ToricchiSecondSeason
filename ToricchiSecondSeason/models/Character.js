@@ -17,7 +17,7 @@ let Character = class Character {
 __decorate([
     typeorm_1.Column({
         primary: true,
-        type: 'text',
+        type: 'varchar',
         comment: 'DiscordID',
         length: 20,
     }),
@@ -26,7 +26,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Name',
-        type: 'text',
+        type: 'varchar',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -45,7 +45,6 @@ __decorate([
 __decorate([
     typeorm_1.CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     }),
     __metadata("design:type", Date)
@@ -53,7 +52,6 @@ __decorate([
 __decorate([
     typeorm_1.UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     }),
     __metadata("design:type", Date)

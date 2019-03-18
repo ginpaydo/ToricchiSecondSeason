@@ -33,8 +33,13 @@ DbStore.connectionOptions = {
     // 設定を書くこと
     // 詳しくはここ！
     // https://typeorm.io/
-    type: "sqlite",
-    database: `./data/data.sqlite`,
+    type: "mysql",
+    database: "toricchi",
+    host: "bostnex",
+    port: 3306,
+    username: "onak",
+    password: "e7mn5hu4",
+    logging: false,
     entities: [
         Character_1.default,
         Facility_1.default,
@@ -63,12 +68,10 @@ function saveAll() {
         var connection = yield DbStore.createConnection();
         // 各テーブルの保存
         yield connection.transaction((transactionalEntityManager) => __awaiter(this, void 0, void 0, function* () {
-            Object.keys(exports.cache).forEach(function (key) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    var val = this[key]; // this は obj
-                    yield transactionalEntityManager.save(val);
-                });
-            }, exports.cache);
+            yield transactionalEntityManager.save(exports.cache["character"]);
+            yield transactionalEntityManager.save(exports.cache["parameter"]);
+            yield transactionalEntityManager.save(exports.cache["facility"]);
+            yield transactionalEntityManager.save(exports.cache["replyMessage"]);
         }));
     });
 }

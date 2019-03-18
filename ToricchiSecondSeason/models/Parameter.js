@@ -24,7 +24,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Name',
-        type: 'text',
+        type: 'varchar',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -34,7 +34,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Value',
-        type: 'text',
+        type: 'varchar',
         comment: '値',
         length: 50,
         default: '何か設定しなさい'
@@ -53,7 +53,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Display',
-        type: 'text',
+        type: 'varchar',
         comment: '表示するパラメータ名',
         default: '何か設定しなさい'
     }),
@@ -62,7 +62,6 @@ __decorate([
 __decorate([
     typeorm_1.CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     }),
     __metadata("design:type", Date)
@@ -70,7 +69,6 @@ __decorate([
 __decorate([
     typeorm_1.UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     }),
     __metadata("design:type", Date)

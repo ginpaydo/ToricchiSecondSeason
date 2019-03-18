@@ -8,10 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("reflect-metadata");
+const _d = require('discord.js');
+const _t = require('typeorm');
+const _r = require('reflect-metadata');
 const DiscordHelper_1 = require("./DiscordHelper");
 const MessageConstants_1 = require("./MessageConstants");
-const ParametersController_1 = require("./controllers/ParametersController");
 const ToricchiHelper_1 = require("./ToricchiHelper");
 const DbStore_1 = require("./DbStore");
 const Shop_1 = require("./Shop");
@@ -19,38 +20,31 @@ const Parameter_1 = require("./models/Parameter");
 'use strict';
 // 設定項目
 //const token = '<DiscordBOTのトークン>';
-const token = 'NDE3ODkyMzU0NDgyMjQxNTQ2.D1P4aA.vTlIbi0U9qltG_zzfHoKNi1RCVk';
+const token = 'NDE3ODkyMzU0NDgyMjQxNTQ2.D1P4aA.vTlIbi0U9qltG_zzfHoKNi1RCVk'; // DbStoreのPasswordも変えること
 //ログイン処理
 const Discord = require('discord.js');
 const client = new Discord.Client();
 client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
-    // 初期状態チェック
-    yield ParametersController_1.default.all().then((parameter) => {
-        if (parameter.length == 0) {
-            // 初期化する
-            console.log(MessageConstants_1.initialMessage);
-            makeParameter("Name", "とりっち", 1, "なまえ");
-            makeParameter("MaxHp", "100", 2, "最大HP");
-            makeParameter("MaxMp", "100", 2, "最大MP");
-            makeParameter("MaxUnko", "100", 99, "最大値");
-            makeParameter("Hp", "100", 1, "HP");
-            makeParameter("Mp", "50", 1, "MP");
-            makeParameter("Unko", "50", 99, "現在の鬱憤");
-            makeParameter("Money", "10000", 2, "資金");
-            makeParameter("Income", "1", 2, "収入");
-            makeParameter("IsDead", "0", 99, "死んでいるか");
-            makeParameter("Death", "0", 99, "死亡回数");
-        }
-    }).catch((err) => {
-        console.log(`${MessageConstants_1.failedMessage} ${err.message}`);
-    });
     // データベースのデータをキャッシュする
     console.log(MessageConstants_1.cacheMessage);
-    DbStore_1.initialize();
-    // TODO:
-    var now = new Date();
-    var day = now.getHours();
-    console.log(day);
+    yield DbStore_1.initialize();
+    // 初期状態チェック
+    if (DbStore_1.cache["parameter"].length == 0) {
+        // 初期化する
+        console.log(MessageConstants_1.initialMessage);
+        makeParameter("Name", "とりっち", 1, "なまえ");
+        makeParameter("MaxHp", "100", 2, "最大HP");
+        makeParameter("MaxMp", "100", 2, "最大MP");
+        makeParameter("MaxUnko", "100", 99, "最大値");
+        makeParameter("Hp", "100", 1, "HP");
+        makeParameter("Mp", "50", 1, "MP");
+        makeParameter("Unko", "50", 99, "現在の鬱憤");
+        makeParameter("Money", "10000", 2, "資金");
+        makeParameter("Income", "1", 2, "収入");
+        makeParameter("IsDead", "0", 99, "死んでいるか");
+        makeParameter("Death", "0", 99, "死亡回数");
+        DbStore_1.saveAll();
+    }
     // 完了メッセージ
     console.log(MessageConstants_1.startupMessage);
 }));
@@ -79,6 +73,8 @@ function makeParameter(name, value, visibleLevel, display) {
     parameter.display = display;
     DbStore_1.cache["parameter"].push(parameter);
 }
+// 前回の時刻
+var preHour = 0;
 // とりっちのID
 var id = null;
 // メッセージの受信
@@ -145,10 +141,18 @@ client.on('message', message => {
                 }
             }
             else {
-                // 除外した結果何もなくなった
-                message.channel.send(`は？`);
+                //// 除外した結果何もなくなった
+                //message.channel.send(`は？`);
             }
         }
+    }
+    // 1時間ごとに保存
+    var now = new Date();
+    var hour = now.getHours();
+    if (hour !== preHour) {
+        preHour = hour;
+        DbStore_1.saveAll();
+        console.log("保存しました");
     }
 });
 // ログイン

@@ -66,7 +66,6 @@ function updateToricchi() {
             updateParameter("IsDead", -1);
             // 名前変更
             if (getParameter("IsToricchi")) {
-                var nameParameter = getParameter("IsToricchi");
                 var death = getParameterNumber("Death");
                 death = Math.min(50 - MessageConstants_1.defaultBotName1.length - MessageConstants_1.defaultBotName3.length, death);
                 var sb = MessageConstants_1.defaultBotName2;

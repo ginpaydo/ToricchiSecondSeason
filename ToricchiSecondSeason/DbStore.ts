@@ -16,8 +16,13 @@ export default class DbStore {
         // 設定を書くこと
         // 詳しくはここ！
         // https://typeorm.io/
-        type: "sqlite",
-        database: `./data/data.sqlite`,
+        type: "mysql",
+        database: "toricchi",
+        host: "bostnex",
+        port: 3306,
+        username: "onak",
+        password: "ぱすわーど",
+        logging: false,
         entities: [
             Character,
             Facility,
@@ -54,9 +59,9 @@ export async function saveAll() {
     
     // 各テーブルの保存
     await connection.transaction(async transactionalEntityManager => {
-        Object.keys(cache).forEach(async function (key) {
-            var val = this[key]; // this は obj
-            await transactionalEntityManager.save(val);
-        }, cache);
+        await transactionalEntityManager.save(cache["character"]);
+        await transactionalEntityManager.save(cache["parameter"]);
+        await transactionalEntityManager.save(cache["facility"]);
+        await transactionalEntityManager.save(cache["replyMessage"]);
     });
 }

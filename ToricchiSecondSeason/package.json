@@ -7,19 +7,31 @@
     "name": ""
   },
   "scripts": {
-    "test": "./node_modules/.bin/mocha  --recursive"
+    "test": "./node_modules/.bin/mocha  --recursive",
+    "build": "webpack",
+    "watch": "webpack -w"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.6",
     "@types/node": "^8.10.43",
     "chai": "^4.2.0",
+    "fuse-box": "^3.7.1",
     "mocha": "^6.0.2",
-    "ts-node": "^8.0.3"
+    "ts-loader": "^5.3.3",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.3.0",
+    "webpack-node-externals": "^1.7.2"
   },
   "dependencies": {
     "discord.js": "^11.4.2",
+    "mysql": "^2.16.0",
+    "nexe": "^2.0.0-rc.34",
     "reflect-metadata": "^0.1.13",
-    "sqlite3": "^4.0.6",
     "typeorm": "^0.2.14"
+  },
+  "resolutions": {
+    "nexe/fuse-box": "3.7.1"
   }
 }

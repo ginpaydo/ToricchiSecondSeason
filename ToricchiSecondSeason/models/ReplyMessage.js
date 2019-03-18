@@ -33,7 +33,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Word',
-        type: 'text',
+        type: 'varchar',
         comment: '応答キーワード',
         length: 100,
         nullable: true
@@ -52,7 +52,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Reply',
-        type: 'text',
+        type: 'varchar',
         comment: '応答内容',
         length: 200,
         nullable: true
@@ -62,7 +62,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Function',
-        type: 'text',
+        type: 'varchar',
         comment: '呼び出す関数名',
         nullable: true
     }),
@@ -80,7 +80,7 @@ __decorate([
 __decorate([
     typeorm_1.Column({
         name: 'Comment',
-        type: 'text',
+        type: 'varchar',
         comment: '説明',
         default: '何か設定しなさい'
     }),
@@ -89,7 +89,6 @@ __decorate([
 __decorate([
     typeorm_1.CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     }),
     __metadata("design:type", Date)
@@ -97,7 +96,6 @@ __decorate([
 __decorate([
     typeorm_1.UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     }),
     __metadata("design:type", Date)

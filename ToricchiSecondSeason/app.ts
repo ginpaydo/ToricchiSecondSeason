@@ -1,7 +1,8 @@
-﻿import "reflect-metadata";
+﻿const _d = require('discord.js');
+const _t = require('typeorm');
+const _r = require('reflect-metadata');
 import { memoryMessage, replaceMessage } from "./DiscordHelper";
 import { failedMessage, initialMessage, startupMessage, cacheMessage, defaultBotName1, defaultBotName2, defaultBotName3 } from "./MessageConstants";
-import ParameterController from "./controllers/ParametersController";
 import { evalFunction, getCharacter, addLike, getParameterNumber, correctMessage, getParameter } from "./ToricchiHelper";
 import { initialize, cache, saveAll } from "./DbStore";
 import { shopping } from "./Shop";
@@ -15,30 +16,27 @@ const token = '<DiscordBOTのトークン>';
 const Discord = require('discord.js');
 const client = new Discord.Client();
 client.on('ready', async () => {
-    // 初期状態チェック
-    await ParameterController.all().then((parameter) => {
-        if (parameter.length == 0) {
-            // 初期化する
-            console.log(initialMessage);
-            makeParameter("Name", "とりっち", 1, "なまえ");
-            makeParameter("MaxHp", "100", 2, "最大HP");
-            makeParameter("MaxMp", "100", 2, "最大MP");
-            makeParameter("MaxUnko", "100", 99, "最大値");
-            makeParameter("Hp", "100", 1, "HP");
-            makeParameter("Mp", "50", 1, "MP");
-            makeParameter("Unko", "50", 99, "現在の鬱憤");
-            makeParameter("Money", "10000", 2, "資金");
-            makeParameter("Income", "1", 2, "収入");
-            makeParameter("IsDead", "0", 99, "死んでいるか");
-            makeParameter("Death", "0", 99, "死亡回数");
-        }
-    }).catch((err) => {
-        console.log(`${failedMessage} ${err.message}`);
-        });
-
     // データベースのデータをキャッシュする
     console.log(cacheMessage);
-    initialize();
+    await initialize();
+
+    // 初期状態チェック
+    if (cache["parameter"].length == 0) {
+        // 初期化する
+        console.log(initialMessage);
+        makeParameter("Name", "とりっち", 1, "なまえ");
+        makeParameter("MaxHp", "100", 2, "最大HP");
+        makeParameter("MaxMp", "100", 2, "最大MP");
+        makeParameter("MaxUnko", "100", 99, "最大値");
+        makeParameter("Hp", "100", 1, "HP");
+        makeParameter("Mp", "50", 1, "MP");
+        makeParameter("Unko", "50", 99, "現在の鬱憤");
+        makeParameter("Money", "10000", 2, "資金");
+        makeParameter("Income", "1", 2, "収入");
+        makeParameter("IsDead", "0", 99, "死んでいるか");
+        makeParameter("Death", "0", 99, "死亡回数");
+        saveAll();
+    }
 
     // 完了メッセージ
     console.log(startupMessage);
@@ -143,8 +141,8 @@ client.on('message', message => {
                     }
                 }
             } else {
-                // 除外した結果何もなくなった
-                message.channel.send(`は？`);
+                //// 除外した結果何もなくなった
+                //message.channel.send(`は？`);
             }
         }
     }

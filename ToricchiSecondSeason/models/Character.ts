@@ -8,7 +8,7 @@ export default class Character {
     // PKだがDiscordIDを使うので自動インクリメントしない
     @Column({
         primary: true,
-        type: 'text',
+        type: 'varchar',
         comment: 'DiscordID',
         length: 20,
     })
@@ -17,7 +17,7 @@ export default class Character {
     // 名前
     @Column({
         name: 'Name',
-        type: 'text',
+        type: 'varchar',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -32,21 +32,18 @@ export default class Character {
         default: 0
     })
     like: number;
-    
+
     // 作成日
     @CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     })
     readonly createdAt: Date;
-    
+
     // 更新日
     @UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     })
     readonly updatedAt: Date;
-    
 }

@@ -14,7 +14,7 @@ export default class Parameter {
     // 名前
     @Column({
         name: 'Name',
-        type: 'text',
+        type: 'varchar',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -24,7 +24,7 @@ export default class Parameter {
     // 値
     @Column({
         name: 'Value',
-        type: 'text',
+        type: 'varchar',
         comment: '値',
         length: 50,
         default: '何か設定しなさい'
@@ -43,7 +43,7 @@ export default class Parameter {
     // 表示するパラメータ名
     @Column({
         name: 'Display',
-        type: 'text',
+        type: 'varchar',
         comment: '表示するパラメータ名',
         default: '何か設定しなさい'
     })
@@ -52,7 +52,6 @@ export default class Parameter {
     // 作成日
     @CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     })
     readonly createdAt: Date;
@@ -60,7 +59,6 @@ export default class Parameter {
     // 更新日
     @UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     })
     readonly updatedAt: Date;

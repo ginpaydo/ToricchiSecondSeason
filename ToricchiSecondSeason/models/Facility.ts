@@ -14,7 +14,7 @@ export default class Facility {
     // 名前
     @Column({
         name: 'Name',
-        type: 'text',
+        type: 'varchar',
         comment: '名前',
         length: 50,
         default: '何か設定しなさい'
@@ -69,27 +69,24 @@ export default class Facility {
     // 説明
     @Column({
         name: 'Comment',
-        type: 'text',
+        type: 'varchar',
         comment: '説明',
         length: 100,
         default: '何か設定しなさい'
     })
     comment: string;
-    
+
     // 作成日
     @CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     })
     readonly createdAt: Date;
-    
+
     // 更新日
     @UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     })
     readonly updatedAt: Date;
-    
 }

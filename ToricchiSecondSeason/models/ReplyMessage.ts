@@ -23,7 +23,7 @@ export default class ReplyMessage {
     // 応答キーワード
     @Column({
         name: 'Word',
-        type: 'text',
+        type: 'varchar',
         comment: '応答キーワード',
         length: 100,
         nullable: true
@@ -42,7 +42,7 @@ export default class ReplyMessage {
     // 応答内容
     @Column({
         name: 'Reply',
-        type: 'text',
+        type: 'varchar',
         comment: '応答内容',
         length: 200,
         nullable: true
@@ -52,7 +52,7 @@ export default class ReplyMessage {
     // 呼び出す関数名
     @Column({
         name: 'Function',
-        type: 'text',
+        type: 'varchar',
         comment: '呼び出す関数名',
         nullable: true
     })
@@ -70,24 +70,22 @@ export default class ReplyMessage {
     // 説明
     @Column({
         name: 'Comment',
-        type: 'text',
+        type: 'varchar',
         comment: '説明',
         default: '何か設定しなさい'
     })
     comment: string;
-    
+
     // 作成日
     @CreateDateColumn({
         name: 'CreatedAt',
-        type: 'date',
         comment: '作成日'
     })
     readonly createdAt: Date;
-    
+
     // 更新日
     @UpdateDateColumn({
         name: 'UpdatedAt',
-        type: 'date',
         comment: '更新日'
     })
     readonly updatedAt: Date;
