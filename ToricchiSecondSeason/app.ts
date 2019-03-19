@@ -1,5 +1,4 @@
-﻿const _d = require('discord.js');
-const _t = require('typeorm');
+﻿const _t = require('typeorm');
 const _r = require('reflect-metadata');
 import { memoryMessage, replaceMessage } from "./DiscordHelper";
 import { failedMessage, initialMessage, startupMessage, cacheMessage, defaultBotName1, defaultBotName2, defaultBotName3 } from "./MessageConstants";

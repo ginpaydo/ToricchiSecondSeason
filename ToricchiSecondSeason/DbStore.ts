@@ -18,7 +18,7 @@ export default class DbStore {
         // https://typeorm.io/
         type: "mysql",
         database: "toricchi",
-        host: "bostnex",
+        host: "bostnex",    // DBと同じサーバにリリースする時は、localhostにする
         port: 3306,
         username: "onak",
         password: "ぱすわーど",
