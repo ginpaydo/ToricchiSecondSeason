@@ -17,6 +17,8 @@ const ReplyMessagesController_1 = require("./controllers/ReplyMessagesController
 const FacilitiesController_1 = require("./controllers/FacilitiesController");
 const ParametersController_1 = require("./controllers/ParametersController");
 const CharactersController_1 = require("./controllers/CharactersController");
+// 設定ファイル
+var config = require('config');
 class DbStore {
     // 接続（シングルトン）
     static createConnection() {
@@ -33,12 +35,12 @@ DbStore.connectionOptions = {
     // 設定を書くこと
     // 詳しくはここ！
     // https://typeorm.io/
-    type: "mysql",
+    type: config.database.type,
     database: "toricchi",
-    host: "bostnex",
+    host: config.database.host,
     port: 3306,
-    username: "onak",
-    password: "e7mn5hu4",
+    username: config.database.username,
+    password: config.database.password,
     logging: false,
     entities: [
         Character_1.default,
@@ -55,10 +57,12 @@ exports.cache = {};
 // 各テーブルをキャッシュする
 function initialize() {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("各テーブルをキャッシュします");
         yield CharactersController_1.default.all().then((val) => { exports.cache["character"] = val; });
         yield ParametersController_1.default.all().then((val) => { exports.cache["parameter"] = val; });
         yield FacilitiesController_1.default.all().then((val) => { exports.cache["facility"] = val; });
         yield ReplyMessagesController_1.default.all().then((val) => { exports.cache["replyMessage"] = val; });
+        console.log("キャッシュ完了");
     });
 }
 exports.initialize = initialize;

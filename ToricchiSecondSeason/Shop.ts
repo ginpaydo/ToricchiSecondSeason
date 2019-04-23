@@ -2,6 +2,7 @@
 import { lastMessage } from "./DiscordHelper";
 import { getCharacter, getParameterNumber, updateParameter, getParameter, correctMessage } from "./ToricchiHelper";
 import Facility from "./models/Facility";
+import { facilityTable } from "./MessageConstants";
 
 // お買い物関係
 
@@ -10,7 +11,7 @@ import Facility from "./models/Facility";
  * @returns テキスト
  */
 export function showInventory() {
-    var list = cache["facility"].filter(function (value) {
+    var list = cache[facilityTable].filter(function (value) {
         return (value.level > 0);
     });
 
@@ -36,7 +37,7 @@ export function showInventory() {
  * @returns テキスト
  */
 export function showBuyList(budget: number) {
-    var list = cache["facility"].filter(function (value) {
+    var list = cache[facilityTable].filter(function (value) {
         return (value.currentPrice < budget);
     });
 
@@ -100,7 +101,7 @@ export function toricchiItemFailure() {
  */
 function calculateIncome() {
     var sum = 0;
-    cache["facility"].forEach((value: Facility) => {
+    cache[facilityTable].forEach((value: Facility) => {
         sum += value.currentIncome;
     });
 
@@ -114,7 +115,7 @@ function calculateIncome() {
 export function shopping() {
     if (buyWith && buyWith == lastMessage.author.id) {
 
-        var item = cache["facility"].find((value => lastMessage.content === String(value.id)));
+        var item = cache[facilityTable].find((value => lastMessage.content === String(value.id)));
 
         if (item) {
             // お買い物

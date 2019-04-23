@@ -51,7 +51,7 @@ exports.resetLike = resetLike;
 function updateToricchi() {
     // MP回復
     updateParameterMax("Mp", "MaxMp", 1);
-    updateParameterMax("Unko", "MaxUnko", 1);
+    updateParameterMax("Stress", "MaxStress", 1);
     // 収入加算
     var income = getParameterNumber("Income");
     updateParameter("Money", income);
@@ -109,9 +109,12 @@ exports.correctMessage = correctMessage;
  * @returns 処理後のパラメータ
  */
 function updateParameterMax(name, maxName, addValue) {
-    var tempmax = getParameter(maxName);
-    var maxHp = Number(tempmax.value);
-    return updateParameter(name, addValue, maxHp);
+    if (tempmax) {
+        var tempmax = getParameter(maxName);
+        var maxValue = Number(tempmax.value);
+        return updateParameter(name, addValue, maxValue);
+    }
+    return tempmax;
 }
 exports.updateParameterMax = updateParameterMax;
 /**
@@ -165,7 +168,6 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min)) + min;
 }
-// TODO:1時間に1度セーブする
 /**
  * 引数で示された名前の関数を呼び出す
  * @param functionName 関数名
@@ -203,7 +205,7 @@ function Status() {
     DiscordHelper_1.lastMessage.channel.send(str);
     return true;
 }
-// 
+// 射撃
 function Shoottori() {
     var res = "(´・ω);y==ｰｰｰｰｰ  ・ ・ ・  :penguin:   ・∵. ﾀｰﾝ <:sushi:418038060110970880> ＜ｷﾞﾝｷﾞﾝｶﾞｰﾄﾞ\n```ぎんぺーに 5 ダメージを与えた！\nぎんぺーはGOXしました。```\n";
     var character = getCharacter(DiscordHelper_1.lastMessage);
@@ -269,7 +271,7 @@ function Help() {
 function DigitalMegaFlare() {
     if (getParameterNumber("Mp") >= 100) {
         var name = getParameter("Name");
-        var income = getParameterNumber("Income") * (getParameterNumber("Unko") + getParameterNumber("Hp"));
+        var income = getParameterNumber("Income") * (getParameterNumber("Stress") + getParameterNumber("Hp"));
         var sb = `「天よ地よ大いなる神よ\n　生きとし生けるもの皆終焉の雄叫びを上げ\n　舞い狂う死神達の宴を始めよ\n　冥界より召喚されし暗黒の扉今開かれん\n　*デジタルメガフレアーーーーーッ！！*」\n\n{botname}の指先から熱線が放たれ、Zaifに深刻なダメージを与えた！！\nZaifはGOXしました。\n{botname}は${income}円獲得しました。`;
         sb = correctMessage(sb);
         DiscordHelper_1.lastMessage.channel.send(sb);
@@ -282,10 +284,11 @@ function DigitalMegaFlare() {
         return false;
     }
 }
-function Unko() {
-    if (getParameterNumber("Unko") >= 50) {
+// ストレスメッセージ
+function Stress() {
+    if (getParameterNumber("Stress") >= 50) {
         DiscordHelper_1.lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
-        updateParameter("Unko", -50);
+        updateParameter("Stress", -50);
         return true;
     }
     else {

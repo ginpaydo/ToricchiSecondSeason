@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const _d = require('discord.js');
 const _t = require('typeorm');
 const _r = require('reflect-metadata');
 const DiscordHelper_1 = require("./DiscordHelper");
@@ -18,31 +17,64 @@ const DbStore_1 = require("./DbStore");
 const Shop_1 = require("./Shop");
 const Parameter_1 = require("./models/Parameter");
 'use strict';
-// 設定項目
-//const token = '<DiscordBOTのトークン>';
-const token = 'NDE3ODkyMzU0NDgyMjQxNTQ2.D1P4aA.vTlIbi0U9qltG_zzfHoKNi1RCVk'; // DbStoreのPasswordも変えること
-//ログイン処理
+// 設定ファイル
+var config = require('config');
+const token = config.token;
 const Discord = require('discord.js');
 const client = new Discord.Client();
+// ログイン
+client.login(token).then(() => {
+    console.log(config.messages.discordConnect);
+});
+// discordクライアントにエラーが発生した場合
+// 一旦強制的に切断して、再接続を試みます。
+var reconnecting = 0; // 接続中
+client.on('error', (error) => __awaiter(this, void 0, void 0, function* () {
+    if (reconnecting == 0) {
+        reconnecting = 1; // 切断中
+        showError(error);
+        // 強制切断
+        console.log(config.messages.destroy);
+        client.destroy().then((value) => __awaiter(this, void 0, void 0, function* () {
+            console.log(config.messages.destroyEnd);
+            yield reconnect(10);
+        }));
+    }
+}));
+/**
+ * 繋がるまで再接続を試みます
+ * @param seconds 待ち時間（秒）
+ */
+function reconnect(seconds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        while (reconnecting == 1) {
+            // 数秒待つ
+            console.log(seconds + config.messages.reconnectWait);
+            yield sleep(seconds * 1000);
+            // 再接続
+            console.log(config.messages.reconnect);
+            yield client.login(token).then(() => {
+                // 何故かここに来ない。ライブラリの不具合？
+                console.log(config.messages.reconnectEnd);
+                reconnecting = 0;
+            }).catch((error) => {
+                showError(error);
+            });
+        }
+    });
+}
+// 初期化処理
 client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
     // データベースのデータをキャッシュする
     console.log(MessageConstants_1.cacheMessage);
     yield DbStore_1.initialize();
     // 初期状態チェック
     if (DbStore_1.cache["parameter"].length == 0) {
-        // 初期化する
+        // 設定ファイルに基づいて初期化する
         console.log(MessageConstants_1.initialMessage);
-        makeParameter("Name", "とりっち", 1, "なまえ");
-        makeParameter("MaxHp", "100", 2, "最大HP");
-        makeParameter("MaxMp", "100", 2, "最大MP");
-        makeParameter("MaxUnko", "100", 99, "最大値");
-        makeParameter("Hp", "100", 1, "HP");
-        makeParameter("Mp", "50", 1, "MP");
-        makeParameter("Unko", "50", 99, "現在の鬱憤");
-        makeParameter("Money", "10000", 2, "資金");
-        makeParameter("Income", "1", 2, "収入");
-        makeParameter("IsDead", "0", 99, "死んでいるか");
-        makeParameter("Death", "0", 99, "死亡回数");
+        config.initialParameter.forEach((value) => {
+            makeParameter(value.name, value.value, value.visibleLevel, value.display);
+        });
         DbStore_1.saveAll();
     }
     // 完了メッセージ
@@ -53,13 +85,15 @@ client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
  * @param newname
  */
 function setBotName(newname) {
-    console.log("名前変更：" + newname);
+    console.log(config.messages.changeName + newname);
     if (id) {
         client.fetchUser(id).then((value) => {
             value.setUsername(newname);
             var name = ToricchiHelper_1.getParameter("Name");
             name.value = newname;
-            value.lastMessage.member.setNickname(newname).catch(() => { console.log("名前変更失敗"); });
+            value.lastMessage.member.setNickname(newname).catch((error) => {
+                showError(error);
+            });
         });
     }
 }
@@ -79,84 +113,90 @@ var preHour = 0;
 var id = null;
 // メッセージの受信
 client.on('message', message => {
-    //Bot自身の発言を無視する
-    if (message.author.bot) {
-        if (!id) {
-            var paramId = ToricchiHelper_1.getParameter("BotUserId");
-            var name = ToricchiHelper_1.getParameter("Name");
-            if (paramId) {
-                id = paramId.value;
-                console.log(name.value + "のIDは" + id);
-            }
-            else {
-                // 初回起動
-                if (name.value === message.author.username) {
-                    makeParameter("BotUserId", message.author.id, 99, "BOTのID");
-                    console.log(name.value + "のIDは" + message.author.id);
-                    id = message.author.id;
-                    if (name.value === MessageConstants_1.defaultBotName1 + MessageConstants_1.defaultBotName2 + MessageConstants_1.defaultBotName3) {
-                        makeParameter("IsToricchi", "1", 99, "とりっちモード");
-                    }
+    try {
+        //Bot自身の発言を無視する
+        if (message.author.bot) {
+            if (!id) {
+                var paramId = ToricchiHelper_1.getParameter("BotUserId");
+                var name = ToricchiHelper_1.getParameter("Name");
+                if (paramId) {
+                    id = paramId.value;
                 }
-            }
-        }
-        return;
-    }
-    // 最後のメッセージを保持、表示
-    DiscordHelper_1.memoryMessage(message);
-    // 死んでたら更新処理のみ
-    var isDead = ToricchiHelper_1.getParameterNumber("IsDead");
-    if (!isDead) {
-        // メッセージから特定の文字を除外する
-        var tempMessage = DiscordHelper_1.replaceMessage(message.content);
-        if (!Shop_1.shopping()) {
-            // 買い物ではない場合
-            if (tempMessage.length > 0) {
-                // 条件に合ったメッセージを取得
-                var candidateList = getCandidateList(tempMessage);
-                // 候補がある場合
-                if (candidateList.length > 0) {
-                    // 発言者データ取得関数
-                    var character = ToricchiHelper_1.getCharacter(message);
-                    // ポイントの高い物から使用するメッセージを判定
-                    var messageData = candidateList.find(function (value) {
-                        return !value.requirePointMin || value.requirePointMin <= character.like;
-                    });
-                    // 単純なメッセージ返信
-                    if (messageData.reply) {
-                        var mes = ToricchiHelper_1.correctMessage(messageData.reply);
-                        message.channel.send(mes);
-                    }
-                    // 関数の動的呼び出し
-                    var success = true;
-                    if (messageData.function) {
-                        success = ToricchiHelper_1.evalFunction(messageData.function);
-                    }
-                    // 全て成功したら発言者に好感度加算
-                    if (success) {
-                        if (messageData.friendlyPoint) {
-                            ToricchiHelper_1.addLike(character, messageData.friendlyPoint);
+                else {
+                    // 初回起動
+                    if (name.value === message.author.username) {
+                        // BOTのIDを記憶する
+                        makeParameter(config.botId.name, message.author.id, config.botId.visibleLevel, config.botId.display);
+                        id = message.author.id;
+                        // 既定の名前になっている場合、とりっちモードにし、死亡イベントで名前が変更される
+                        if (name.value === MessageConstants_1.defaultBotName1 + MessageConstants_1.defaultBotName2 + MessageConstants_1.defaultBotName3) {
+                            makeParameter(config.toricchiMode.name, config.toricchiMode.value, config.toricchiMode.visibleLevel, config.toricchiMode.display);
                         }
                     }
                 }
             }
-            else {
-                //// 除外した結果何もなくなった
-                //message.channel.send(`は？`);
+            return;
+        }
+        // 最後のメッセージを保持、表示
+        DiscordHelper_1.memoryMessage(message);
+        // 死んでたら更新処理のみ
+        var isDead = ToricchiHelper_1.getParameterNumber("IsDead");
+        if (!isDead) {
+            // メッセージから特定の文字を除外する
+            var tempMessage = DiscordHelper_1.replaceMessage(message.content);
+            if (!Shop_1.shopping()) {
+                // 買い物ではない場合
+                if (tempMessage.length > 0) {
+                    // 条件に合ったメッセージを取得
+                    var candidateList = getCandidateList(tempMessage);
+                    // 候補がある場合
+                    if (candidateList.length > 0) {
+                        // 発言者データ取得関数
+                        var character = ToricchiHelper_1.getCharacter(message);
+                        // ポイントの高い物から使用するメッセージを判定
+                        var messageData = candidateList.find(function (value) {
+                            return !value.requirePointMin || value.requirePointMin <= character.like;
+                        });
+                        // 単純なメッセージ返信
+                        if (messageData.reply) {
+                            var mes = ToricchiHelper_1.correctMessage(messageData.reply);
+                            message.channel.send(mes);
+                        }
+                        // 関数の動的呼び出し
+                        var success = true;
+                        if (messageData.function) {
+                            success = ToricchiHelper_1.evalFunction(messageData.function);
+                        }
+                        // 全て成功したら発言者に好感度加算
+                        if (success) {
+                            if (messageData.friendlyPoint) {
+                                ToricchiHelper_1.addLike(character, messageData.friendlyPoint);
+                            }
+                        }
+                    }
+                }
+                else {
+                    // 不要な文字を除外した結果何もなくなった場合はランダムで返答する
+                    // 画像だけの場合もあるので
+                    if (!message.attachments.size || message.attachments.size === 0) {
+                        message.channel.send(randomMessage(config.nothingMessage));
+                    }
+                }
             }
         }
+        // 1時間ごとに保存
+        var now = new Date();
+        var hour = now.getHours();
+        if (hour !== preHour) {
+            preHour = hour;
+            DbStore_1.saveAll();
+            console.log(config.messages.saveEnd);
+        }
     }
-    // 1時間ごとに保存
-    var now = new Date();
-    var hour = now.getHours();
-    if (hour !== preHour) {
-        preHour = hour;
-        DbStore_1.saveAll();
-        console.log("保存しました");
+    catch (error) {
+        showError(error);
     }
 });
-// ログイン
-client.login(token);
 /**
  * メッセージ候補を降順で取得する
  * @param messageContent メッセージ本文
@@ -186,5 +226,30 @@ function getCandidateList(messageContent) {
         return 0;
     });
     return candidateList;
+}
+/**
+ * 待機する
+ * @param milliseconds ミリ秒
+ */
+function sleep(milliseconds) {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), milliseconds);
+    });
+}
+/**
+ * エラー内容表示
+ * @param error
+ */
+function showError(error) {
+    console.log(config.messages.reconnectFailed + error.name);
+    console.log(error.message);
+    console.log(error.stack);
+}
+/**
+ * ランダムで選択するメッセージ
+ * @param values
+ */
+function randomMessage(values) {
+    return values[Math.floor(Math.random() * values.length)];
 }
 //# sourceMappingURL=app.js.map

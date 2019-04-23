@@ -1,0 +1,99 @@
+﻿# DiscordBOTのトークン
+token: "<BOT TOKEN>"
+# クライアントエラーで再接続するときの待機秒数
+reconnectSeconds: 300
+# データベース接続設定
+database:
+    type: "mysql"
+    database: "toricchi"
+# リリース時にhostは切り替えること
+    host: "192.168.0.9"
+#    host: localhost
+    port: 3306
+    username: "user"
+    password: "pass"
+    logging: false
+    synchronize: true
+
+# システムメッセージ
+messages:
+    discordConnect: "Discord接続完了"
+    error: "エラー発生："
+    destroy: "強制的に切断します"
+    destroyEnd: "切断完了"
+    reconnectWait: "秒待機します"
+    reconnect: "再接続します"
+    reconnectEnd: "接続完了"
+    reconnectFailed: "接続失敗："
+    changeName: "名前変更："
+    saveEnd: "保存完了："
+    cacheEnd: "キャッシュ完了"
+    initialMessage: "初期状態なので、データを登録してください"
+    cacheMessage: "データのキャッシュを行います"
+    startupMessage: "起動しました"
+    makeCharacterMessage: "この利用者が見つかりませんでした。データを作成します:"
+nothingMessage:
+    - "は？"
+    - "なんとか言えやー"
+    - "どうした？"
+# 初期ステータス
+initialParameter:
+    - name:  "Name"
+      value: "とりっち"
+      visibleLevel: 1
+      display: "なまえ"
+    - name:  "MaxHp"
+      value: "100"
+      visibleLevel: 2
+      display: "最大HP"
+    - name:  "MaxMp"
+      value: "100"
+      visibleLevel: 2
+      display: "最大MP"
+    - name:  "MaxStress"
+      value: "100"
+      visibleLevel: 99
+      display: "最大値"
+    - name:  "Hp"
+      value: "50"
+      visibleLevel: 1
+      display: "HP"
+    - name:  "Mp"
+      value: "50"
+      visibleLevel: 1
+      display: "MP"
+    - name:  "Stress"
+      value: "50"
+      visibleLevel: 99
+      display: "現在の鬱憤"
+    - name:  "Money"
+      value: "10000"
+      visibleLevel: 2
+      display: "資金"
+    - name:  "Income"
+      value: "1"
+      visibleLevel: 2
+      display: "収入"
+    - name:  "IsDead"
+      value: "0"
+      visibleLevel: 99
+      display: "死んでいるか"
+    - name:  "Death"
+      value: "0"
+      visibleLevel: 99
+      display: "死亡回数"
+botId:
+    name:  "BotUserId"
+    visibleLevel: 99
+    display: "BOTのID"
+toricchiMode:
+    name:  "IsToricchi"
+    value: "1"
+    visibleLevel: 99
+    display: "とりっちモード"
+defaultName:
+    head: "とり"
+    body: "っ"
+    foot: "ち"
+# config.reconnectSeconds
+# config.messages.saveEnd

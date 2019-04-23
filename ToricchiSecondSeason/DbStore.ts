@@ -7,7 +7,10 @@ import ReplyMessageController from './controllers/ReplyMessagesController';
 import FacilityController from './controllers/FacilitiesController';
 import ParameterController from './controllers/ParametersController';
 import CharacterController from './controllers/CharactersController';
+import { characterTable, parameterTable, facilityTable, replyMessageTable } from './MessageConstants';
 
+// 設定ファイル
+var config = require('config');
 export default class DbStore {
     private static _conn: Connection;
 
@@ -16,13 +19,13 @@ export default class DbStore {
         // 設定を書くこと
         // 詳しくはここ！
         // https://typeorm.io/
-        type: "mysql",
-        database: "toricchi",
-        host: "bostnex",    // DBと同じサーバにリリースする時は、localhostにする
-        port: 3306,
-        username: "onak",
-        password: "ぱすわーど",
-        logging: false,
+        type: config.database.type,
+        database: config.database.database,
+        host: config.database.host,
+        port: config.database.port,
+        username: config.database.username,
+        password: config.database.password,
+        logging: config.database.logging,
         entities: [
             Character,
             Facility,
@@ -30,7 +33,7 @@ export default class DbStore {
             ReplyMessage
         ],
         // Model変更をデータベースのテーブル定義に反映する
-        synchronize: true
+        synchronize: config.database.synchronize
     };
 
     // 接続（シングルトン）
@@ -47,10 +50,11 @@ export var cache = {};
 
 // 各テーブルをキャッシュする
 export async function initialize() {
-    await CharacterController.all().then((val) => { cache["character"] = val; });
-    await ParameterController.all().then((val) => { cache["parameter"] = val; });
-    await FacilityController.all().then((val) => { cache["facility"] = val; });
-    await ReplyMessageController.all().then((val) => { cache["replyMessage"] = val; });
+    await CharacterController.all().then((val) => { cache[characterTable] = val; });
+    await ParameterController.all().then((val) => { cache[parameterTable] = val; });
+    await FacilityController.all().then((val) => { cache[facilityTable] = val; });
+    await ReplyMessageController.all().then((val) => { cache[replyMessageTable] = val; });
+    console.log(config.messages.cacheEnd);
 }
 
 // 各テーブルをDBに一括保存する（削除はしない）
@@ -59,9 +63,9 @@ export async function saveAll() {
     
     // 各テーブルの保存
     await connection.transaction(async transactionalEntityManager => {
-        await transactionalEntityManager.save(cache["character"]);
-        await transactionalEntityManager.save(cache["parameter"]);
-        await transactionalEntityManager.save(cache["facility"]);
-        await transactionalEntityManager.save(cache["replyMessage"]);
+        await transactionalEntityManager.save(cache[characterTable]);
+        await transactionalEntityManager.save(cache[parameterTable]);
+        await transactionalEntityManager.save(cache[facilityTable]);
+        await transactionalEntityManager.save(cache[replyMessageTable]);
     });
 }

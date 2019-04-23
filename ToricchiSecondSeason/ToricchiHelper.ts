@@ -1,11 +1,14 @@
 ﻿// とりっっちに関する処理
 import Parameter from "./models/Parameter";
 import Character from "./models/Character";
-import { makeCharacterMessage, helpTrimList, defaultBotName1, defaultBotName2, defaultBotName3 } from "./MessageConstants";
+import { helpTrimList, characterTable, parameterTable, replyMessageTable } from "./MessageConstants";
 import { saveAll, cache } from "./DbStore";
 import { lastMessage } from "./DiscordHelper";
 import { inventoryCall, buyItemCall } from "./Shop";
 import { setBotName } from "./app";
+
+// 設定ファイル
+var config = require('config');
 
 /**
  * 利用者データを取得する
@@ -15,15 +18,15 @@ import { setBotName } from "./app";
  */
 export function getCharacter(message): Character {
     // 探す
-    var result: Character = cache["character"].find(item => item.id === message.author.id);
+    var result: Character = cache[characterTable].find(item => item.id === message.author.id);
     if (!result) {
         // 無かったので作成
-        console.log(makeCharacterMessage + message.author.username);
+        console.log(config.messages.makeCharacterMessage + message.author.username);
         result = new Character();
         result.id = message.author.id;
         result.like = 0;
         result.name = message.author.username;
-        cache["character"].push(result);
+        cache[characterTable].push(result);
     }
     return result;
 }
@@ -53,7 +56,7 @@ export function resetLike(character) {
 export function updateToricchi() {
     // MP回復
     updateParameterMax("Mp", "MaxMp", 1);
-    updateParameterMax("Unko", "MaxUnko", 1);
+    updateParameterMax("Stress", "MaxStress", 1);
     // 収入加算
     var income = getParameterNumber("Income");
     updateParameter("Money", income);
@@ -69,12 +72,12 @@ export function updateToricchi() {
             // 名前変更
             if (getParameter("IsToricchi")) {
                 var death = getParameterNumber("Death");
-                death = Math.min(50 - defaultBotName1.length - defaultBotName3.length, death);
-                var sb = defaultBotName2;
+                death = Math.min(50 - config.defaultName.head.length - config.defaultName.foot.length, death);
+                var sb = config.defaultName.body;
                 for (var i = 0; i < death; i++) {
-                    sb = sb + defaultBotName2;
+                    sb = sb + config.defaultName.body;
                 }
-                setBotName(defaultBotName1 + sb + defaultBotName3);
+                setBotName(config.defaultName.head + sb + config.defaultName.foot);
             }
         }
     }
@@ -110,9 +113,12 @@ export function correctMessage(mes): string {
  * @returns 処理後のパラメータ
  */
 export function updateParameterMax(name, maxName, addValue): Parameter {
-    var tempmax = getParameter(maxName);
-    var maxHp = Number(tempmax.value);
-    return updateParameter(name, addValue, maxHp);
+    if (tempmax) {
+        var tempmax = getParameter(maxName);
+        var maxValue = Number(tempmax.value);
+        return updateParameter(name, addValue, maxValue);
+    }
+    return tempmax;
 }
 /**
  * パラメータを指定してステータスを取得する
@@ -121,7 +127,7 @@ export function updateParameterMax(name, maxName, addValue): Parameter {
  */
 export function getParameter(name): Parameter {
     // 探す
-    var result: Parameter = cache["parameter"].find(item => item.name === name);
+    var result: Parameter = cache[parameterTable].find(item => item.name === name);
     return result;
 }
 /**
@@ -164,8 +170,6 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-// TODO:1時間に1度セーブする
-
 /**
  * 引数で示された名前の関数を呼び出す
  * @param functionName 関数名
@@ -195,7 +199,7 @@ function Status() {
     }
 
     var str = "```";
-    cache["parameter"].filter(function (value) {
+    cache[parameterTable].filter(function (value) {
         return (value.visibleLevel <= level);
     }).forEach((value) => {
         str = str + "\n" + paddingright(value.display, " ", 10) + ":" + value.value;
@@ -205,7 +209,7 @@ function Status() {
     return true;
 }
 
-// 
+// 射撃
 function Shoottori() {
 
     var res = "(´・ω);y==ｰｰｰｰｰ  ・ ・ ・  :penguin:   ・∵. ﾀｰﾝ <:sushi:418038060110970880> ＜ｷﾞﾝｷﾞﾝｶﾞｰﾄﾞ\n```ぎんぺーに 5 ダメージを与えた！\nぎんぺーはGOXしました。```\n";
@@ -258,7 +262,7 @@ function Shoottori() {
 // コマンド説明
 function Help() {
     var helpstr = "```";
-    cache["replyMessage"].filter(function (value) {
+    cache[replyMessageTable].filter(function (value) {
         return (value.isVisible);
     }).forEach((value) => {
 
@@ -278,7 +282,7 @@ function Help() {
 function DigitalMegaFlare() {
     if (getParameterNumber("Mp") >= 100) {
         var name = getParameter("Name");
-        var income = getParameterNumber("Income") * (getParameterNumber("Unko") + getParameterNumber("Hp"));
+        var income = getParameterNumber("Income") * (getParameterNumber("Stress") + getParameterNumber("Hp"));
         var sb = `「天よ地よ大いなる神よ\n　生きとし生けるもの皆終焉の雄叫びを上げ\n　舞い狂う死神達の宴を始めよ\n　冥界より召喚されし暗黒の扉今開かれん\n　*デジタルメガフレアーーーーーッ！！*」\n\n{botname}の指先から熱線が放たれ、Zaifに深刻なダメージを与えた！！\nZaifはGOXしました。\n{botname}は${income}円獲得しました。`;
         sb = correctMessage(sb);
         lastMessage.channel.send(sb);
@@ -291,10 +295,11 @@ function DigitalMegaFlare() {
     }
 }
 
-function Unko() {
-    if (getParameterNumber("Unko") >= 50) {
+// ストレスメッセージ
+function Stress() {
+    if (getParameterNumber("Stress") >= 50) {
         lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
-        updateParameter("Unko", -50);
+        updateParameter("Stress", -50);
         return true;
     } else {
         return false;
