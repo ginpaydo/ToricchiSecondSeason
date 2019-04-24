@@ -2,27 +2,27 @@
 DiscordBOT製作第二期、TypeScript製、MariaDBを使用。
 ![ToricchiSecondSeason](https://user-images.githubusercontent.com/39305262/54169110-c287ea00-44b4-11e9-80db-ceb1c9bde233.png "ToricchiSecondSeason")
 ## はじめに
-Discordのチャットで特定の文字に対して反応し、メッセージを返すだけのBOTです。
-特に役立つ機能はありません。
-殆ど自分の勉強用プロジェクトです。
+Discordのチャットで特定の文字に対して反応し、メッセージを返すだけのBOTです。  
+特に役立つ機能はありません。  
+殆ど自分の勉強用プロジェクトです。  
 作った反省点としては、型は分かる限りは書かないとIDEが活かせないことだと思います。
 ### 前提条件
-javascript(node.js)が動作する環境ならば動作します。
-別途、MariaDBを準備する必要があります。
+javascript(node.js)が動作する環境ならば動作します。  
+別途、MariaDBを準備する必要があります。  
 Discord用BOTなので、[Discord開発者用ページ](https://discordapp.com/developers/applications/) でトークンを作成しておく必要があります。
 
 ### インストール方法
-インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。
-app.ts(app.js)をエントリーポイントに起動すれば動作する。
-ビルドする前に、```config/default.yaml```内の以下の部分にDiscord開発者用ページで作成したトークンを書く。
+インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。  
+app.ts(app.js)をエントリーポイントに起動すれば動作する。  
+ビルドする前に、```config/default.yaml```内の以下の部分にDiscord開発者用ページで作成したトークンを書く。  
 同ファイルのデータベースの設定部分を環境に合わせて変更する。
 
 ####■nexeを使う場合
-PowreShell等を使って、nexeをグローバルでインストールする。
-```npm i -g nexe@next```
+PowreShell等を使って、nexeをグローバルでインストールする。  
+```npm i -g nexe@next```  
 ビルドして、nexeでパッケージングする。  
-app.tsがあるディレクトリまで移動して以下を実行する。
-```nexe app.js```
+app.tsがあるディレクトリまで移動して以下を実行する。  
+```nexe app.js```  
 ※app.tsだとexe起動できない。
 
 この2つを任意のディレクトリに移動する。
@@ -31,9 +31,9 @@ app.tsがあるディレクトリまで移動して以下を実行する。
 **動作しない場合、node_modulesフォルダが必要かもしれない（未確認）**
 
 ####■webpackを使う方法（推奨）
-webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。
+webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。  
 ```npm run build```
-distにjsファイルが出力されるので、これを実行環境にコピー。
+distにjsファイルが出力されるので、これを実行環境にコピー。  
 node_modulesフォルダもjsと同ディレクトリにコピー。  
   
 または、node_modulesをコピーせずに以下の5つを実行環境でnpmインストールする。  
