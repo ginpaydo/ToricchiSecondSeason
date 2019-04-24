@@ -14,10 +14,10 @@ Discord用BOTなので、[Discord開発者用ページ](https://discordapp.com/d
 ### インストール方法
 インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。  
 app.ts(app.js)をエントリーポイントに起動すれば動作する。  
-ビルドする前に、```config/default.yaml```内の以下の部分にDiscord開発者用ページで作成したトークンを書く。  
-同ファイルのデータベースの設定部分を環境に合わせて変更する。
+起動前に、```config/default.yaml```内にDiscord開発者用ページで作成したトークンを設定する。  
+また、同ファイルのデータベースの設定部分を環境に合わせて変更する。
 
-####■nexeを使う場合
+#### ■nexeを使う場合
 PowreShell等を使って、nexeをグローバルでインストールする。  
 ```npm i -g nexe@next```  
 ビルドして、nexeでパッケージングする。  
@@ -28,15 +28,16 @@ app.tsがあるディレクトリまで移動して以下を実行する。
 この2つを任意のディレクトリに移動する。
 * app.exe
 * configフォルダ
+  
 **動作しない場合、node_modulesフォルダが必要かもしれない（未確認）**
 
-####■webpackを使う方法（推奨）
+#### ■webpackを使う方法（推奨）
 webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。  
 ```npm run build```
 distにjsファイルが出力されるので、これを実行環境にコピー。  
-node_modulesフォルダもjsと同ディレクトリにコピー。  
+configフォルダもjsと同ディレクトリにコピー。  
   
-または、node_modulesをコピーせずに以下の5つを実行環境でnpmインストールする。  
+以下の5つを実行環境でnpmインストールする。  
 * discord.js
 * mysql
 * typeorm
@@ -48,12 +49,12 @@ exe実行したらプロンプト画面が出てくるので、そのままに�
 DiscordにBOTを追加する。
 （https://discordapp.com/oauth2/authorize?client_id=<Discord開発者用ページで取得したクライアントID>&scope=bot&permissions=0）
 
-## デプロイ
 ## 協働するシステムのリスト
 * [Discord](https://discordapp.com/) - Discord
 * [discord.js](https://discord.js.org/#/) - Discord BOT用ライブラリ
 * MariaDB
 * typeorm
+* node-config
 
 ## コントリビューション
 私たちのコーディング規範とプルリクエストの手順についての詳細は[CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) を参照してください。
@@ -68,5 +69,3 @@ DiscordにBOTを追加する。
 
 ## 課題
 * [致命的な課題はこちら](https://github.com/ginpaydo/ToricchiSecondSeason/issues)
-* 各種ハードコードの外部データ化（文字列、好感度による条件分岐）
-* グローバル領域に散らかっている関数のクラス化
