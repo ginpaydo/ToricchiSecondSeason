@@ -3,22 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const DbStore_1 = require("./DbStore");
 const DiscordHelper_1 = require("./DiscordHelper");
 const ToricchiHelper_1 = require("./ToricchiHelper");
+const MessageConstants_1 = require("./MessageConstants");
 // お買い物関係
 /**
  * 持ち物リスト表示
  * @returns テキスト
  */
 function showInventory() {
-    var list = DbStore_1.cache["facility"].filter(function (value) {
+    var list = DbStore_1.cache[MessageConstants_1.facilityTable].filter(function (value) {
         return (value.level > 0);
     });
     var sb = "";
     sb = sb + "```";
     if (Object.keys(list).length == 0) {
-        sb = sb + "\n何もないぜ";
+        sb = sb + ToricchiHelper_1.getSpeech("message9");
     }
     else {
-        sb = sb + "【施設：{botname}の収入を増やします。】";
+        sb = sb + ToricchiHelper_1.getSpeech("message10");
         list.forEach((value) => {
             sb = sb + `\n[${value.id}]${value.name}:レベル${value.level} 総合生産量${value.currentIncome}円\n\t${value.comment}`;
         });
@@ -34,7 +35,7 @@ exports.showInventory = showInventory;
  * @returns テキスト
  */
 function showBuyList(budget) {
-    var list = DbStore_1.cache["facility"].filter(function (value) {
+    var list = DbStore_1.cache[MessageConstants_1.facilityTable].filter(function (value) {
         return (value.currentPrice < budget);
     });
     var sb = "```";
@@ -42,7 +43,7 @@ function showBuyList(budget) {
         return null;
     }
     else {
-        sb = sb + "【施設：{botname}の収入を増やします。】";
+        sb = sb + ToricchiHelper_1.getSpeech("message10");
         list.forEach((value) => {
             sb = sb + `\n[${value.id}]${value.name}:レベル${value.level} 購入価格${value.currentPrice}円 生産力${value.baseIncome}円\n\t${value.comment}`;
         });
@@ -56,14 +57,14 @@ exports.showBuyList = showBuyList;
  * 買い物成功
  */
 function toricchiItemSuccess() {
-    var res = "買ったぜ。ふん、まあこんなもんだろ。";
+    var res = ToricchiHelper_1.getSpeech("message11");
     var character = ToricchiHelper_1.getCharacter(DiscordHelper_1.lastMessage);
     if (character.like >= 5) {
         if (character.like >= 10) {
-            res = "良いモン選んでくれたじゃねぇか。大切にするぜ。";
+            res = ToricchiHelper_1.getSpeech("message12");
         }
         else {
-            res = "買ったぜ。お前にしてはまあまあなチョイスだな。";
+            res = ToricchiHelper_1.getSpeech("message13");
         }
     }
     DiscordHelper_1.lastMessage.channel.send(res);
@@ -75,14 +76,14 @@ exports.toricchiItemSuccess = toricchiItemSuccess;
  * 買い物失敗
  */
 function toricchiItemFailure() {
-    var res = "テメェわざわざ俺のこと呼んでおいて買い物行かねぇのかよふざけんな！:rage:";
+    var res = ToricchiHelper_1.getSpeech("message14");
     var character = ToricchiHelper_1.getCharacter(DiscordHelper_1.lastMessage);
     if (character.like >= 5) {
         if (character.like >= 10) {
-            res = "…何だ何も買わねぇのか。俺は帰るぜ。";
+            res = ToricchiHelper_1.getSpeech("message15");
         }
         else {
-            res = "は？んなもん売ってねぇよ。もういい、帰る。:angry:";
+            res = ToricchiHelper_1.getSpeech("message16");
         }
     }
     DiscordHelper_1.lastMessage.channel.send(res);
@@ -96,7 +97,7 @@ exports.toricchiItemFailure = toricchiItemFailure;
  */
 function calculateIncome() {
     var sum = 0;
-    DbStore_1.cache["facility"].forEach((value) => {
+    DbStore_1.cache[MessageConstants_1.facilityTable].forEach((value) => {
         sum += value.currentIncome;
     });
     return sum;
@@ -107,7 +108,7 @@ function calculateIncome() {
  */
 function shopping() {
     if (buyWith && buyWith == DiscordHelper_1.lastMessage.author.id) {
-        var item = DbStore_1.cache["facility"].find((value => DiscordHelper_1.lastMessage.content === String(value.id)));
+        var item = DbStore_1.cache[MessageConstants_1.facilityTable].find((value => DiscordHelper_1.lastMessage.content === String(value.id)));
         if (item) {
             // お買い物
             // お金減少
@@ -154,12 +155,12 @@ function buyItemCall() {
     var buyList = showBuyList(budget);
     if (buyList) {
         res = res + buyList;
-        res = res + "\n何を買えばいいんだ？番号で言ってくれよな。";
+        res = res + ToricchiHelper_1.getSpeech("message17");
         // 一緒に買い物中
         buyWith = DiscordHelper_1.lastMessage.author.id;
     }
     else {
-        res = res + "\n```何も買えねぇじゃねーか！```";
+        res = res + ToricchiHelper_1.getSpeech("message18");
         buyWith = null;
         budget = 0;
     }
@@ -170,7 +171,7 @@ exports.buyItemCall = buyItemCall;
 // 持ち物表示
 function inventoryCall() {
     var res = "";
-    var character = ToricchiHelper_1.getCharacter(DiscordHelper_1.lastMessage);
+    //var character = getCharacter(lastMessage);
     // 持ち物リスト表示
     res = res + showInventory();
     DiscordHelper_1.lastMessage.channel.send(res);

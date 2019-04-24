@@ -1,6 +1,6 @@
 ﻿import { cache } from "./DbStore";
 import { lastMessage } from "./DiscordHelper";
-import { getCharacter, getParameterNumber, updateParameter, getParameter, correctMessage } from "./ToricchiHelper";
+import { getCharacter, getParameterNumber, updateParameter, getParameter, correctMessage, getSpeech } from "./ToricchiHelper";
 import Facility from "./models/Facility";
 import { facilityTable } from "./MessageConstants";
 
@@ -19,9 +19,9 @@ export function showInventory() {
     sb = sb + "```";
     
     if (Object.keys(list).length == 0) {
-        sb = sb + "\n何もないぜ";
+        sb = sb + getSpeech("message9");
     } else {
-        sb = sb + "【施設：{botname}の収入を増やします。】";
+        sb = sb + getSpeech("message10");
         list.forEach((value) => {
             sb = sb + `\n[${value.id}]${value.name}:レベル${value.level} 総合生産量${value.currentIncome}円\n\t${value.comment}`;
         });
@@ -46,7 +46,7 @@ export function showBuyList(budget: number) {
     if (Object.keys(list).length == 0) {
         return null;
     } else {
-        sb = sb + "【施設：{botname}の収入を増やします。】";
+        sb = sb + getSpeech("message10");
         list.forEach((value) => {
             sb = sb + `\n[${value.id}]${value.name}:レベル${value.level} 購入価格${value.currentPrice}円 生産力${value.baseIncome}円\n\t${value.comment}`;
         });
@@ -61,14 +61,14 @@ export function showBuyList(budget: number) {
  * 買い物成功
  */
 export function toricchiItemSuccess() {
-    var res = "買ったぜ。ふん、まあこんなもんだろ。";
+    var res = getSpeech("message11");
     var character = getCharacter(lastMessage);
 
     if (character.like >= 5) {
         if (character.like >= 10) {
-            res = "良いモン選んでくれたじゃねぇか。大切にするぜ。";
+            res = getSpeech("message12");
         } else {
-            res = "買ったぜ。お前にしてはまあまあなチョイスだな。";
+            res = getSpeech("message13");
         }
     }
     lastMessage.channel.send(res);
@@ -80,14 +80,14 @@ export function toricchiItemSuccess() {
  * 買い物失敗
  */
 export function toricchiItemFailure() {
-    var res = "テメェわざわざ俺のこと呼んでおいて買い物行かねぇのかよふざけんな！:rage:";
+    var res = getSpeech("message14");
     var character = getCharacter(lastMessage);
 
     if (character.like >= 5) {
         if (character.like >= 10) {
-            res = "…何だ何も買わねぇのか。俺は帰るぜ。";
+            res = getSpeech("message15");
         } else {
-            res = "は？んなもん売ってねぇよ。もういい、帰る。:angry:";
+            res = getSpeech("message16");
         }
     }
     lastMessage.channel.send(res);
@@ -165,11 +165,11 @@ export function buyItemCall() {
     var buyList = showBuyList(budget);
     if (buyList) {
         res = res + buyList;
-        res = res + "\n何を買えばいいんだ？番号で言ってくれよな。";
+        res = res + getSpeech("message17");
         // 一緒に買い物中
         buyWith = lastMessage.author.id;
     } else {
-        res = res + "\n```何も買えねぇじゃねーか！```";
+        res = res + getSpeech("message18");
         buyWith = null;
         budget = 0;
     }
@@ -182,7 +182,7 @@ export function buyItemCall() {
 // 持ち物表示
 export function inventoryCall() {
     var res = "";
-    var character = getCharacter(lastMessage);
+    //var character = getCharacter(lastMessage);
     // 持ち物リスト表示
     res = res + showInventory();
 

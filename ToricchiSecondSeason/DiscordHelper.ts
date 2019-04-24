@@ -65,4 +65,3 @@ export function replaceMessage(messageStr) {
     
     return result;
 }
-

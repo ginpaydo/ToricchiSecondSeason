@@ -6,6 +6,8 @@ const DbStore_1 = require("./DbStore");
 const DiscordHelper_1 = require("./DiscordHelper");
 const Shop_1 = require("./Shop");
 const app_1 = require("./app");
+// 設定ファイル
+var config = require('config');
 /**
  * 利用者データを取得する
  * 無ければ作成する
@@ -14,15 +16,15 @@ const app_1 = require("./app");
  */
 function getCharacter(message) {
     // 探す
-    var result = DbStore_1.cache["character"].find(item => item.id === message.author.id);
+    var result = DbStore_1.cache[MessageConstants_1.characterTable].find(item => item.id === message.author.id);
     if (!result) {
         // 無かったので作成
-        console.log(MessageConstants_1.makeCharacterMessage + message.author.username);
+        console.log(config.messages.makeCharacterMessage + message.author.username);
         result = new Character_1.default();
         result.id = message.author.id;
         result.like = 0;
         result.name = message.author.username;
-        DbStore_1.cache["character"].push(result);
+        DbStore_1.cache[MessageConstants_1.characterTable].push(result);
     }
     return result;
 }
@@ -67,12 +69,12 @@ function updateToricchi() {
             // 名前変更
             if (getParameter("IsToricchi")) {
                 var death = getParameterNumber("Death");
-                death = Math.min(50 - MessageConstants_1.defaultBotName1.length - MessageConstants_1.defaultBotName3.length, death);
-                var sb = MessageConstants_1.defaultBotName2;
+                death = Math.min(50 - config.defaultName.head.length - config.defaultName.foot.length, death);
+                var sb = config.defaultName.body;
                 for (var i = 0; i < death; i++) {
-                    sb = sb + MessageConstants_1.defaultBotName2;
+                    sb = sb + config.defaultName.body;
                 }
-                app_1.setBotName(MessageConstants_1.defaultBotName1 + sb + MessageConstants_1.defaultBotName3);
+                app_1.setBotName(config.defaultName.head + sb + config.defaultName.foot);
             }
         }
     }
@@ -95,9 +97,11 @@ function paddingright(val, char, n) {
  * @returns 修正後のメッセージ
  */
 function correctMessage(mes) {
-    var mes = mes.split("\\n").join('\n'); // \nで改行させる
-    mes = mes.split("{name}").join(DiscordHelper_1.lastMessage.author.username); // {name}に名前を代入する
-    mes = mes.split("{botname}").join(getParameter("Name").value); // {botname}に名前を代入する
+    if (mes) {
+        var mes = mes.split("\\n").join('\n'); // \nで改行させる
+        mes = mes.split("{name}").join(DiscordHelper_1.lastMessage.author.username); // {name}に名前を代入する
+        mes = mes.split("{botname}").join(getParameter("Name").value); // {botname}に名前を代入する
+    }
     return mes;
 }
 exports.correctMessage = correctMessage;
@@ -124,7 +128,7 @@ exports.updateParameterMax = updateParameterMax;
  */
 function getParameter(name) {
     // 探す
-    var result = DbStore_1.cache["parameter"].find(item => item.name === name);
+    var result = DbStore_1.cache[MessageConstants_1.parameterTable].find(item => item.name === name);
     return result;
 }
 exports.getParameter = getParameter;
@@ -196,7 +200,7 @@ function Status() {
         level = 2;
     }
     var str = "```";
-    DbStore_1.cache["parameter"].filter(function (value) {
+    DbStore_1.cache[MessageConstants_1.parameterTable].filter(function (value) {
         return (value.visibleLevel <= level);
     }).forEach((value) => {
         str = str + "\n" + paddingright(value.display, " ", 10) + ":" + value.value;
@@ -207,22 +211,17 @@ function Status() {
 }
 // 射撃
 function Shoottori() {
-    var res = "(´・ω);y==ｰｰｰｰｰ  ・ ・ ・  :penguin:   ・∵. ﾀｰﾝ <:sushi:418038060110970880> ＜ｷﾞﾝｷﾞﾝｶﾞｰﾄﾞ\n```ぎんぺーに 5 ダメージを与えた！\nぎんぺーはGOXしました。```\n";
+    var res = getSpeech("message3");
     var character = getCharacter(DiscordHelper_1.lastMessage);
     var randomInt = getRandomInt(0, 10) % 2;
     if (character.like >= 10) {
         switch (randomInt) {
             case 0:
-                res = "(´・ω);y==ｰｰｰｰｰ  ・ ・   <:sushi:418038060110970880>    ・∵. ﾀｰﾝ\n```{botname}に 10 ダメージを与えた！```\n";
-                res = res + "ぐっ…油断したぜ。\nお前のことを信じてしまったばかりに……。:confounded:";
+                res = getSpeech("message6");
                 updateParameter("Hp", -10);
                 break;
             default:
-                res = "…ん？どうした{name}？";
-                res = res + "```{name}は、{botname}の背後から優しく抱きしめて引き金を引いた。```\n";
-                res = res + "(´・ω);y==<:sushi:418038060110970880>    ・∵. ﾀｰﾝ\n```{botname}に 20 ダメージを与えた！```\n";
-                res = res + "ぐあああああああっ！！！！:tired_face:";
-                res = res + "```{name}は、{botname}の血を腹に塗りながら笑った。```\n";
+                res = getSpeech("message7");
                 updateParameter("Hp", -20);
                 break;
         }
@@ -230,19 +229,16 @@ function Shoottori() {
     else {
         switch (randomInt) {
             case 0:
-                res = res + "ふん、のろまなお前に俺が撃てるわけねぇだろ:smirk:";
+                res = res + getSpeech("message4");
                 break;
             default:
-                res = res + "…おいお前何てことしやがるんだ！\n見損なったぞ！:rage:";
+                res = res + getSpeech("message5");
                 break;
         }
     }
     // 死亡判定
     if (getParameterNumber("Hp") <= 0) {
-        res = res + "\n```{name}は{botname}を倒した！```\n";
-        res = res + "………ッ！\nゴホッ……かはっ……！\n強くなったな{name}…。だが、覚えているがいい。\nお前の心に欲望がある限り、俺は何度でも蘇るだろう。\nその時までせいぜいつかの間の平和を楽しむがいい……。";
-        res = res + "\n```こうして、このチャンネルに再び平和が訪れました。\nめでたしめでたし```";
-        res = res + "\n```{botname}　制作スタッフ\n\n企画　ぎんぺー\n原案　ぎんぺー\n設計　ぎんぺー\nメインプログラム　ぎんぺー\nシナリオ　ぎんぺー\n疲労　ぎんぺー\n\nAND YOU\n\n\n　　　　　　　　　　　終\n　　　　　　　　　制作・著作\n　　　　　　　　　　━━━━━\n　　　　　　　　　　銀兵堂```";
+        res = res + getSpeech("message8");
         updateParameter("IsDead", 1);
         updateParameter("Death", 1);
         resetLike(character);
@@ -254,7 +250,7 @@ function Shoottori() {
 // コマンド説明
 function Help() {
     var helpstr = "```";
-    DbStore_1.cache["replyMessage"].filter(function (value) {
+    DbStore_1.cache[MessageConstants_1.replyMessageTable].filter(function (value) {
         return (value.isVisible);
     }).forEach((value) => {
         var result = value.word;
@@ -270,24 +266,24 @@ function Help() {
 // デジタルメガフレア
 function DigitalMegaFlare() {
     if (getParameterNumber("Mp") >= 100) {
-        var name = getParameter("Name");
         var income = getParameterNumber("Income") * (getParameterNumber("Stress") + getParameterNumber("Hp"));
-        var sb = `「天よ地よ大いなる神よ\n　生きとし生けるもの皆終焉の雄叫びを上げ\n　舞い狂う死神達の宴を始めよ\n　冥界より召喚されし暗黒の扉今開かれん\n　*デジタルメガフレアーーーーーッ！！*」\n\n{botname}の指先から熱線が放たれ、Zaifに深刻なダメージを与えた！！\nZaifはGOXしました。\n{botname}は${income}円獲得しました。`;
+        var sb = getSpeech("message0");
         sb = correctMessage(sb);
+        sb = sb.split("{income}").join(income.toString());
         DiscordHelper_1.lastMessage.channel.send(sb);
         updateParameter("Mp", -100);
         updateParameter("Money", income);
         return true;
     }
     else {
-        DiscordHelper_1.lastMessage.channel.send("す、すまん。MPが足りないようだ……。");
+        DiscordHelper_1.lastMessage.channel.send(getSpeech("message1"));
         return false;
     }
 }
 // ストレスメッセージ
 function Stress() {
     if (getParameterNumber("Stress") >= 50) {
-        DiscordHelper_1.lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
+        DiscordHelper_1.lastMessage.channel.send(getSpeech("message2"));
         updateParameter("Stress", -50);
         return true;
     }
@@ -304,4 +300,40 @@ function BuyItem() {
     return Shop_1.buyItemCall();
 }
 exports.BuyItem = BuyItem;
+/**
+ * 台詞を取得する
+ * @param speechNo 台詞番号
+ */
+function getSpeech(speechNo) {
+    var candidateList = [];
+    // 条件に合った台詞を集める
+    DbStore_1.cache[MessageConstants_1.speechTable].forEach((value) => {
+        if (speechNo === value.no) {
+            candidateList.push(value);
+        }
+    });
+    // 昇順に並び変える
+    candidateList.sort(function (a, b) {
+        if (a.dataOrder == null && b.dataOrder == null)
+            return 0;
+        if (a.dataOrder == null)
+            return 1;
+        if (b.dataOrder == null)
+            return -1;
+        if (a.dataOrder > b.dataOrder)
+            return 1;
+        if (a.dataOrder < b.dataOrder)
+            return -1;
+        return 0;
+    });
+    // 改行で繋げる
+    var result = "";
+    candidateList.forEach((value) => {
+        result = result + "\n" + value.data;
+    });
+    // 特殊タグを置き換える
+    result = correctMessage(result);
+    return result;
+}
+exports.getSpeech = getSpeech;
 //# sourceMappingURL=ToricchiHelper.js.map

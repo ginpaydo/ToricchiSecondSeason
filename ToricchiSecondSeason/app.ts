@@ -1,11 +1,14 @@
 ﻿const _t = require('typeorm');
 const _r = require('reflect-metadata');
 import { memoryMessage, replaceMessage } from "./DiscordHelper";
-import { parameterTable, replyMessageTable } from "./MessageConstants";
+import { parameterTable, replyMessageTable, facilityTable, speechTable } from "./MessageConstants";
 import { evalFunction, getCharacter, addLike, getParameterNumber, correctMessage, getParameter } from "./ToricchiHelper";
 import { initialize, cache, saveAll } from "./DbStore";
 import { shopping } from "./Shop";
 import Parameter from "./models/Parameter";
+import Speech from "./models/Speech";
+import Facility from "./models/Facility";
+import ReplyMessage from "./models/ReplyMessage";
 'use strict';
 // 設定ファイル
 var config = require('config');
@@ -19,45 +22,6 @@ client.login(token).then(() => {
     console.log(config.messages.discordConnect);
 });
 
-// discordクライアントにエラーが発生した場合
-// 一旦強制的に切断して、再接続を試みます。
-var reconnecting = 0;   // 接続中
-client.on('error', async (error: Error) => {
-    if (reconnecting == 0) {
-        reconnecting = 1;   // 切断中
-        showError(error);
-
-        // 強制切断
-        console.log(config.messages.destroy);
-        client.destroy().then(async (value) => {
-            console.log(config.messages.destroyEnd);
-            await reconnect(10);
-        });
-    }
-});
-
-/**
- * 繋がるまで再接続を試みます
- * @param seconds 待ち時間（秒）
- */
-async function reconnect(seconds: number) {
-    while (reconnecting == 1) {
-        // 数秒待つ
-        console.log(seconds + config.messages.reconnectWait);
-        await sleep(seconds * 1000);
-
-        // 再接続
-        console.log(config.messages.reconnect);
-        await client.login(token).then(() => {
-            // 何故かここに来ない。ライブラリの不具合？
-            console.log(config.messages.reconnectEnd);
-            reconnecting = 0;
-        }).catch((error: Error) => {
-            showError(error);
-        });
-    }
-}
-
 // 初期化処理
 client.on('ready', async () => {
     // データベースのデータをキャッシュする
@@ -65,11 +29,39 @@ client.on('ready', async () => {
     await initialize();
 
     // 初期状態チェック
-    if (cache[parameterTable].length == 0) {
-        // 設定ファイルに基づいて初期化する
-        console.log(config.messages.initialMessage);
+    // 各テーブルを設定ファイルに基づいて初期化する
+    if (cache[parameterTable].length === 0) {
+        // パラメータ初期化
+        console.log(config.messages.initialzeParameter);
         config.initialParameter.forEach((value) => {
             makeParameter(value.name, value.value, value.visibleLevel, value.display);
+        });
+        saveAll();
+    }
+
+    if (cache[facilityTable].length === 0) {
+        // 施設データ初期化
+        console.log(config.messages.initialzeFacility);
+        config.initialFacility.forEach((value) => {
+            makeFacility(value.name, value.basePrice, value.baseIncome, value.comment);
+        });
+        saveAll();
+    }
+
+    if (cache[replyMessageTable].length === 0) {
+        // 会話データ初期化
+        console.log(config.messages.initialzeReply);
+        config.initialReplyMessage.forEach((value) => {
+            makeReplyMessage(value.friendlyPoint, value.word, value.requirePointMin, value.reply, value.func, value.isVisible, correctMessage(value.comment));
+        });
+        saveAll();
+    }
+
+    if (cache[speechTable].length === 0) {
+        // 台詞データ初期化
+        console.log(config.messages.initialzeSpeech);
+        config.initialSpeech.forEach((value) => {
+            makeSpeech(value.no, value.dataOrder, value.data);
         });
         saveAll();
     }
@@ -78,33 +70,7 @@ client.on('ready', async () => {
     console.log(config.messages.startupMessage);
 });
 
-/**
- * とりっちの名前変更
- * @param newname
- */
-export function setBotName(newname) {
-    console.log(config.messages.changeName + newname)
-    if (id) {
-        client.fetchUser(id).then((value) => {
-            value.setUsername(newname);
-            var name = getParameter("Name");
-            name.value = newname;
-            value.lastMessage.member.setNickname(newname).catch((error: Error) => {
-                showError(error);
-            });
-        });
-    }
-}
 
-// パラメータを追加する
-function makeParameter(name: string, value: string, visibleLevel: number, display: string) {
-    var parameter = new Parameter();
-    parameter.value = value;
-    parameter.name = name;
-    parameter.visibleLevel = visibleLevel;
-    parameter.display = display;
-    cache[parameterTable].push(parameter);
-}
 
 // 前回の時刻
 var preHour = 0;
@@ -200,6 +166,45 @@ client.on('message', message => {
     }
 });
 
+// discordクライアントにエラーが発生した場合
+// 一旦強制的に切断して、再接続を試みます。
+var reconnecting = 0;   // 接続中
+client.on('error', async (error: Error) => {
+    if (reconnecting == 0) {
+        reconnecting = 1;   // 切断中
+        showError(error);
+
+        // 強制切断
+        console.log(config.messages.destroy);
+        client.destroy().then(async (value) => {
+            console.log(config.messages.destroyEnd);
+            await reconnect(10);
+        });
+    }
+});
+
+/**
+ * 繋がるまで再接続を試みます
+ * @param seconds 待ち時間（秒）
+ */
+async function reconnect(seconds: number) {
+    while (reconnecting == 1) {
+        // 数秒待つ
+        console.log(seconds + config.messages.reconnectWait);
+        await sleep(seconds * 1000);
+
+        // 再接続
+        console.log(config.messages.reconnect);
+        await client.login(token).then(() => {
+            // 何故かここに来ない。ライブラリの不具合？
+            console.log(config.messages.reconnectEnd);
+            reconnecting = 0;
+        }).catch((error: Error) => {
+            showError(error);
+        });
+    }
+}
+
 /**
  * メッセージ候補を降順で取得する
  * @param messageContent メッセージ本文
@@ -227,6 +232,77 @@ function getCandidateList(messageContent) {
     });
     return candidateList;
 
+}
+
+/**
+ * とりっちの名前変更
+ * @param newname
+ */
+export function setBotName(newname) {
+    console.log(config.messages.changeName + newname)
+    if (id) {
+        client.fetchUser(id).then((value) => {
+            value.setUsername(newname);
+            var name = getParameter("Name");
+            name.value = newname;
+            value.lastMessage.member.setNickname(newname).catch((error: Error) => {
+                showError(error);
+            });
+        });
+    }
+}
+
+// パラメータを追加する
+function makeParameter(name: string, value: string, visibleLevel: number, display: string) {
+    var temp = new Parameter();
+    temp.value = value;
+    temp.name = name;
+    temp.visibleLevel = visibleLevel;
+    temp.display = display;
+    cache[parameterTable].push(temp);
+}
+
+// 施設を追加する
+function makeFacility(name: string, basePrice: number, baseIncome: number, comment: string) {
+    var temp = new Facility();
+    temp.name = name;
+    temp.basePrice = basePrice;
+    temp.baseIncome = baseIncome;
+    temp.level = 0;
+    temp.currentPrice = basePrice;
+    temp.currentIncome = baseIncome;
+    temp.comment = comment;
+    cache[parameterTable].push(temp);
+}
+
+// 応答メッセージを追加する
+function makeReplyMessage(friendlyPoint: number, word: string, requirePointMin: number, reply: string, func: string, isVisible: boolean, comment: string) {
+    var temp = new ReplyMessage();
+    if (friendlyPoint) {
+        temp.friendlyPoint = friendlyPoint;
+    }
+    temp.word = word;
+    if (requirePointMin) {
+        temp.requirePointMin = requirePointMin;
+    }
+    temp.reply = reply;
+    if (func) {
+        temp.function = func;
+    }
+    temp.isVisible = isVisible;
+    if (comment) {
+        temp.comment = comment;
+    }
+    cache[parameterTable].push(temp);
+}
+
+// 台詞を追加する
+function makeSpeech(no: string, dataOrder: number, data: string) {
+    var temp = new Speech();
+    temp.no = no;
+    temp.dataOrder = dataOrder;
+    temp.data = data;
+    cache[parameterTable].push(temp);
 }
 
 /**

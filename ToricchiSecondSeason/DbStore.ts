@@ -7,7 +7,9 @@ import ReplyMessageController from './controllers/ReplyMessagesController';
 import FacilityController from './controllers/FacilitiesController';
 import ParameterController from './controllers/ParametersController';
 import CharacterController from './controllers/CharactersController';
-import { characterTable, parameterTable, facilityTable, replyMessageTable } from './MessageConstants';
+import { characterTable, parameterTable, facilityTable, replyMessageTable, speechTable } from './MessageConstants';
+import Speech from './models/Speech';
+import SpeechController from './controllers/SpeechController';
 
 // 設定ファイル
 var config = require('config');
@@ -30,7 +32,8 @@ export default class DbStore {
             Character,
             Facility,
             Parameter,
-            ReplyMessage
+            ReplyMessage,
+            Speech
         ],
         // Model変更をデータベースのテーブル定義に反映する
         synchronize: config.database.synchronize
@@ -54,6 +57,7 @@ export async function initialize() {
     await ParameterController.all().then((val) => { cache[parameterTable] = val; });
     await FacilityController.all().then((val) => { cache[facilityTable] = val; });
     await ReplyMessageController.all().then((val) => { cache[replyMessageTable] = val; });
+    await SpeechController.all().then((val) => { cache[speechTable] = val; });
     console.log(config.messages.cacheEnd);
 }
 
@@ -67,5 +71,6 @@ export async function saveAll() {
         await transactionalEntityManager.save(cache[parameterTable]);
         await transactionalEntityManager.save(cache[facilityTable]);
         await transactionalEntityManager.save(cache[replyMessageTable]);
+        await transactionalEntityManager.save(cache[speechTable]);
     });
 }

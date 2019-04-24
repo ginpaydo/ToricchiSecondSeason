@@ -1,11 +1,12 @@
 ﻿// とりっっちに関する処理
 import Parameter from "./models/Parameter";
 import Character from "./models/Character";
-import { helpTrimList, characterTable, parameterTable, replyMessageTable } from "./MessageConstants";
+import { helpTrimList, characterTable, parameterTable, replyMessageTable, speechTable } from "./MessageConstants";
 import { saveAll, cache } from "./DbStore";
 import { lastMessage } from "./DiscordHelper";
 import { inventoryCall, buyItemCall } from "./Shop";
 import { setBotName } from "./app";
+import Speech from "./models/Speech";
 
 // 設定ファイル
 var config = require('config');
@@ -47,8 +48,6 @@ export function addLike(character, like) {
 export function resetLike(character) {
     character.like = 0;
 }
-
-
 
 /**
  * メッセージ受信ごとにとりっっちの状態を更新する
@@ -100,9 +99,11 @@ function paddingright(val, char, n) {
  * @returns 修正後のメッセージ
  */
 export function correctMessage(mes): string {
-    var mes = mes.split("\\n").join('\n');    // \nで改行させる
-    mes = mes.split("{name}").join(lastMessage.author.username); // {name}に名前を代入する
-    mes = mes.split("{botname}").join(getParameter("Name").value); // {botname}に名前を代入する
+    if (mes) {
+        var mes = mes.split("\\n").join('\n');    // \nで改行させる
+        mes = mes.split("{name}").join(lastMessage.author.username); // {name}に名前を代入する
+        mes = mes.split("{botname}").join(getParameter("Name").value); // {botname}に名前を代入する
+    }
     return mes;
 }
 /**
@@ -212,43 +213,35 @@ function Status() {
 // 射撃
 function Shoottori() {
 
-    var res = "(´・ω);y==ｰｰｰｰｰ  ・ ・ ・  :penguin:   ・∵. ﾀｰﾝ <:sushi:418038060110970880> ＜ｷﾞﾝｷﾞﾝｶﾞｰﾄﾞ\n```ぎんぺーに 5 ダメージを与えた！\nぎんぺーはGOXしました。```\n";
+    var res = getSpeech("message3");
 
     var character = getCharacter(lastMessage);
     var randomInt = getRandomInt(0, 10) % 2;
     if (character.like >= 10) {
         switch (randomInt) {
             case 0:
-                res = "(´・ω);y==ｰｰｰｰｰ  ・ ・   <:sushi:418038060110970880>    ・∵. ﾀｰﾝ\n```{botname}に 10 ダメージを与えた！```\n";
-                res = res + "ぐっ…油断したぜ。\nお前のことを信じてしまったばかりに……。:confounded:";
+                res = getSpeech("message6");
                 updateParameter("Hp", -10);
                 break;
             default:
-                res = "…ん？どうした{name}？";
-                res = res + "```{name}は、{botname}の背後から優しく抱きしめて引き金を引いた。```\n";
-                res = res + "(´・ω);y==<:sushi:418038060110970880>    ・∵. ﾀｰﾝ\n```{botname}に 20 ダメージを与えた！```\n";
-                res = res + "ぐあああああああっ！！！！:tired_face:";
-                res = res + "```{name}は、{botname}の血を腹に塗りながら笑った。```\n";
+                res = getSpeech("message7");
                 updateParameter("Hp", -20);
                 break;
         }
     } else {
         switch (randomInt) {
             case 0:
-                res = res + "ふん、のろまなお前に俺が撃てるわけねぇだろ:smirk:";
+                res = res + getSpeech("message4");
                 break;
             default:
-                res = res + "…おいお前何てことしやがるんだ！\n見損なったぞ！:rage:";
+                res = res + getSpeech("message5");
                 break;
         }
     }
 
     // 死亡判定
     if (getParameterNumber("Hp") <= 0) {
-        res = res + "\n```{name}は{botname}を倒した！```\n";
-        res = res + "………ッ！\nゴホッ……かはっ……！\n強くなったな{name}…。だが、覚えているがいい。\nお前の心に欲望がある限り、俺は何度でも蘇るだろう。\nその時までせいぜいつかの間の平和を楽しむがいい……。";
-        res = res + "\n```こうして、このチャンネルに再び平和が訪れました。\nめでたしめでたし```";
-        res = res + "\n```{botname}　制作スタッフ\n\n企画　ぎんぺー\n原案　ぎんぺー\n設計　ぎんぺー\nメインプログラム　ぎんぺー\nシナリオ　ぎんぺー\n疲労　ぎんぺー\n\nAND YOU\n\n\n　　　　　　　　　　　終\n　　　　　　　　　制作・著作\n　　　　　　　　　　━━━━━\n　　　　　　　　　　銀兵堂```";
+        res = res + getSpeech("message8");
         updateParameter("IsDead", 1);
         updateParameter("Death", 1);
         resetLike(character);
@@ -281,16 +274,16 @@ function Help() {
 // デジタルメガフレア
 function DigitalMegaFlare() {
     if (getParameterNumber("Mp") >= 100) {
-        var name = getParameter("Name");
         var income = getParameterNumber("Income") * (getParameterNumber("Stress") + getParameterNumber("Hp"));
-        var sb = `「天よ地よ大いなる神よ\n　生きとし生けるもの皆終焉の雄叫びを上げ\n　舞い狂う死神達の宴を始めよ\n　冥界より召喚されし暗黒の扉今開かれん\n　*デジタルメガフレアーーーーーッ！！*」\n\n{botname}の指先から熱線が放たれ、Zaifに深刻なダメージを与えた！！\nZaifはGOXしました。\n{botname}は${income}円獲得しました。`;
+        var sb = getSpeech("message0");
         sb = correctMessage(sb);
+        sb = sb.split("{income}").join(income.toString());
         lastMessage.channel.send(sb);
         updateParameter("Mp", -100);
         updateParameter("Money", income);
         return true;
     } else {
-        lastMessage.channel.send("す、すまん。MPが足りないようだ……。");
+        lastMessage.channel.send(getSpeech("message1"));
         return false;
     }
 }
@@ -298,7 +291,7 @@ function DigitalMegaFlare() {
 // ストレスメッセージ
 function Stress() {
     if (getParameterNumber("Stress") >= 50) {
-        lastMessage.channel.send("うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:");
+        lastMessage.channel.send(getSpeech("message2"));
         updateParameter("Stress", -50);
         return true;
     } else {
@@ -313,6 +306,42 @@ function Inventory() {
 // アイテム購入
 export function BuyItem() {
     return buyItemCall();
+}
+
+
+/**
+ * 台詞を取得する
+ * @param speechNo 台詞番号
+ */
+export function getSpeech(speechNo: string): string {
+    var candidateList: Speech[] = [];
+
+    // 条件に合った台詞を集める
+    cache[speechTable].forEach((value: Speech) => {
+        if (speechNo === value.no) {
+            candidateList.push(value);
+        }
+    });
+
+    // 昇順に並び変える
+    candidateList.sort(function (a, b) {
+        if (a.dataOrder == null && b.dataOrder == null) return 0;
+        if (a.dataOrder == null) return 1;
+        if (b.dataOrder == null) return -1;
+        if (a.dataOrder > b.dataOrder) return 1;
+        if (a.dataOrder < b.dataOrder) return -1;
+        return 0;
+    });
+
+    // 改行で繋げる
+    var result = "";
+    candidateList.forEach((value: Speech) => {
+        result = result + "\n" + value.data;
+    });
+    // 特殊タグを置き換える
+    result = correctMessage(result);
+
+    return result;
 }
 
 

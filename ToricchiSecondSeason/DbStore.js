@@ -17,6 +17,9 @@ const ReplyMessagesController_1 = require("./controllers/ReplyMessagesController
 const FacilitiesController_1 = require("./controllers/FacilitiesController");
 const ParametersController_1 = require("./controllers/ParametersController");
 const CharactersController_1 = require("./controllers/CharactersController");
+const MessageConstants_1 = require("./MessageConstants");
+const Speech_1 = require("./models/Speech");
+const SpeechController_1 = require("./controllers/SpeechController");
 // 設定ファイル
 var config = require('config');
 class DbStore {
@@ -36,20 +39,21 @@ DbStore.connectionOptions = {
     // 詳しくはここ！
     // https://typeorm.io/
     type: config.database.type,
-    database: "toricchi",
+    database: config.database.database,
     host: config.database.host,
-    port: 3306,
+    port: config.database.port,
     username: config.database.username,
     password: config.database.password,
-    logging: false,
+    logging: config.database.logging,
     entities: [
         Character_1.default,
         Facility_1.default,
         Parameter_1.default,
-        ReplyMessage_1.default
+        ReplyMessage_1.default,
+        Speech_1.default
     ],
     // Model変更をデータベースのテーブル定義に反映する
-    synchronize: true
+    synchronize: config.database.synchronize
 };
 exports.default = DbStore;
 // とりっっちのデータキャッシュ
@@ -57,12 +61,12 @@ exports.cache = {};
 // 各テーブルをキャッシュする
 function initialize() {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("各テーブルをキャッシュします");
-        yield CharactersController_1.default.all().then((val) => { exports.cache["character"] = val; });
-        yield ParametersController_1.default.all().then((val) => { exports.cache["parameter"] = val; });
-        yield FacilitiesController_1.default.all().then((val) => { exports.cache["facility"] = val; });
-        yield ReplyMessagesController_1.default.all().then((val) => { exports.cache["replyMessage"] = val; });
-        console.log("キャッシュ完了");
+        yield CharactersController_1.default.all().then((val) => { exports.cache[MessageConstants_1.characterTable] = val; });
+        yield ParametersController_1.default.all().then((val) => { exports.cache[MessageConstants_1.parameterTable] = val; });
+        yield FacilitiesController_1.default.all().then((val) => { exports.cache[MessageConstants_1.facilityTable] = val; });
+        yield ReplyMessagesController_1.default.all().then((val) => { exports.cache[MessageConstants_1.replyMessageTable] = val; });
+        yield SpeechController_1.default.all().then((val) => { exports.cache[MessageConstants_1.speechTable] = val; });
+        console.log(config.messages.cacheEnd);
     });
 }
 exports.initialize = initialize;
@@ -72,10 +76,11 @@ function saveAll() {
         var connection = yield DbStore.createConnection();
         // 各テーブルの保存
         yield connection.transaction((transactionalEntityManager) => __awaiter(this, void 0, void 0, function* () {
-            yield transactionalEntityManager.save(exports.cache["character"]);
-            yield transactionalEntityManager.save(exports.cache["parameter"]);
-            yield transactionalEntityManager.save(exports.cache["facility"]);
-            yield transactionalEntityManager.save(exports.cache["replyMessage"]);
+            yield transactionalEntityManager.save(exports.cache[MessageConstants_1.characterTable]);
+            yield transactionalEntityManager.save(exports.cache[MessageConstants_1.parameterTable]);
+            yield transactionalEntityManager.save(exports.cache[MessageConstants_1.facilityTable]);
+            yield transactionalEntityManager.save(exports.cache[MessageConstants_1.replyMessageTable]);
+            yield transactionalEntityManager.save(exports.cache[MessageConstants_1.speechTable]);
         }));
     });
 }

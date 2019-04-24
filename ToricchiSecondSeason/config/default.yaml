@@ -1,7 +1,9 @@
 ﻿# DiscordBOTのトークン
-token: "<BOT TOKEN>"
+token: "<DiscordBOTのトークン>"
+
 # クライアントエラーで再接続するときの待機秒数
 reconnectSeconds: 300
+
 # データベース接続設定
 database:
     type: "mysql"
@@ -10,7 +12,7 @@ database:
     host: "192.168.0.9"
 #    host: localhost
     port: 3306
-    username: "user"
+    username: "onak"
     password: "pass"
     logging: false
     synchronize: true
@@ -28,66 +30,71 @@ messages:
     changeName: "名前変更："
     saveEnd: "保存完了："
     cacheEnd: "キャッシュ完了"
-    initialMessage: "初期状態なので、データを登録してください"
+    initialzeParameter: "初期状態なので、パラメータを登録します"
+    initialzeFacility: "初期状態なので、施設データを登録します"
+    initialzeReply: "初期状態なので、会話データを登録します"
+    initialzeSpeech: "初期状態なので、台詞データを登録します"
     cacheMessage: "データのキャッシュを行います"
     startupMessage: "起動しました"
     makeCharacterMessage: "この利用者が見つかりませんでした。データを作成します:"
+
+########## 以下データ ##########
 nothingMessage:
     - "は？"
     - "なんとか言えやー"
     - "どうした？"
 # 初期ステータス
 initialParameter:
-    - name:  "Name"
+    - name: "Name"
       value: "とりっち"
       visibleLevel: 1
       display: "なまえ"
-    - name:  "MaxHp"
+    - name: "MaxHp"
       value: "100"
       visibleLevel: 2
       display: "最大HP"
-    - name:  "MaxMp"
+    - name: "MaxMp"
       value: "100"
       visibleLevel: 2
       display: "最大MP"
-    - name:  "MaxStress"
+    - name: "MaxStress"
       value: "100"
       visibleLevel: 99
       display: "最大値"
-    - name:  "Hp"
+    - name: "Hp"
       value: "50"
       visibleLevel: 1
       display: "HP"
-    - name:  "Mp"
+    - name: "Mp"
       value: "50"
       visibleLevel: 1
       display: "MP"
-    - name:  "Stress"
+    - name: "Stress"
       value: "50"
       visibleLevel: 99
       display: "現在の鬱憤"
-    - name:  "Money"
+    - name: "Money"
       value: "10000"
       visibleLevel: 2
       display: "資金"
-    - name:  "Income"
+    - name: "Income"
       value: "1"
       visibleLevel: 2
       display: "収入"
-    - name:  "IsDead"
+    - name: "IsDead"
       value: "0"
       visibleLevel: 99
       display: "死んでいるか"
-    - name:  "Death"
+    - name: "Death"
       value: "0"
       visibleLevel: 99
       display: "死亡回数"
 botId:
-    name:  "BotUserId"
+    name: "BotUserId"
     visibleLevel: 99
     display: "BOTのID"
 toricchiMode:
-    name:  "IsToricchi"
+    name: "IsToricchi"
     value: "1"
     visibleLevel: 99
     display: "とりっちモード"
@@ -95,5 +102,521 @@ defaultName:
     head: "とり"
     body: "っ"
     foot: "ち"
-# config.reconnectSeconds
-# config.messages.saveEnd
+
+# 初期施設
+initialFacility:
+    - name: "ピーナッツ栽培"
+      basePrice: 100
+      baseIncome: 5
+      comment: "ピーナッツを栽培します。"
+    - name: "ソフトクリームの製造"
+      basePrice: 250
+      baseIncome: 10
+      comment: "ソフトクリームを作ります。"
+    - name: "からあげクンの製造"
+      basePrice: 500
+      baseIncome: 20
+      comment: "からあげクンを作ります。"
+    - name: "カレーライスの製造"
+      basePrice: 1000
+      baseIncome: 40
+      comment: "カレーライスを作ります。"
+    - name: "蛇口"
+      basePrice: 2000
+      baseIncome: 80
+      comment: "仮想通貨を恵んでもらいます。"
+    - name: "おばあちゃん"
+      basePrice: 4000
+      baseIncome: 160
+      comment: "おばあちゃんに手伝ってもらいます。クッキー作りが得意だそうです。"
+    - name: "ブログ"
+      basePrice: 8000
+      baseIncome: 300
+      comment: "ブログで情報を流して儲けます。"
+    - name: "せどり"
+      basePrice: 16000
+      baseIncome: 600
+      comment: "フリマアプリを使って安く仕入れて売ります。"
+    - name: "仮想通貨売買BOT"
+      basePrice: 32000
+      baseIncome: 1200
+      comment: "最強の仮想通貨自動売買BOTを開発して運用します。"
+    - name: "ゲーム"
+      basePrice: 60000
+      baseIncome: 2400
+      comment: "Webに自作ゲームを公開して情弱に課金してもらいます。"
+    - name: "マイニングファーム"
+      basePrice: 120000
+      baseIncome: 4800
+      comment: "マイニング事業に投資します。"
+    - name: "ロケット工場"
+      basePrice: 240000
+      baseIncome: 9000
+      comment: "ロケット工場を買収して、製造プラントを確保します。"
+
+# 初期応答メッセージ
+initialReplyMessage:
+    - friendlyPoint: 1
+      word: "^test$"
+      requirePointMin: 
+      reply: "試験開始の合図があるまで この問題冊子の中を見ることは許さん:rage:"
+      func: ""
+      isVisible: false
+      comment: "テスト"
+    - friendlyPoint: 1
+      word: "^テスト$"
+      requirePointMin: 
+      reply: "試験開始の合図があるまで この問題冊子の中を見ることは許さん:rage:"
+      func: ""
+      isVisible: false
+      comment: "テスト"
+    - friendlyPoint: 1
+      word: "^help$"
+      requirePointMin: 
+      reply: "これが俺の持っている技の一覧だ。"
+      func: "Help"
+      isVisible: true
+      comment: "コマンドの説明をしてくれます。"
+    - friendlyPoint: 
+      word: "^inventory$"
+      requirePointMin: 
+      reply: "テメェ俺のこと嗅ぎまわりやがってどういうつもりだ:rage:"
+      func: ""
+      isVisible: true
+      comment: "{botname}の持ち物を見せて貰います。"
+    - friendlyPoint: 1
+      word: "^inventory$"
+      requirePointMin: 5
+      reply: "ふん。ちょっと見るだけだからな。:confused:"
+      func: "Inventory"
+      isVisible: false
+      comment: "{botname}の持ち物を見せて貰います。"
+    - friendlyPoint: 1
+      word: "^inventory$"
+      requirePointMin: 10
+      reply: "ヘヘヘ、いいぜ…。俺のとっておきを見せてやる。:laughing:"
+      func: "Inventory"
+      isVisible: false
+      comment: "{botname}の持ち物を見せて貰います。"
+    - friendlyPoint: 
+      word: "^buyitem$"
+      requirePointMin: 
+      reply: "な、何でお前と買い物しなきゃならねぇんだよ……:angry:"
+      func: "BuyItem"
+      isVisible: true
+      comment: "{botname}と楽しいお買い物をします。"
+    - friendlyPoint: 
+      word: "^buyitem$"
+      requirePointMin: 5
+      reply: "なんだ買い物か。\n…あまり高いものは買わんぞ。:triumph:"
+      func: "BuyItem"
+      isVisible: false
+      comment: "{botname}と楽しいお買い物をします。"
+    - friendlyPoint: 
+      word: "^buyitem$"
+      requirePointMin: 10
+      reply: "おう行こうぜ！\n何でも好きなもの買ってやるからな:kissing_heart:"
+      func: "BuyItem"
+      isVisible: false
+      comment: "{botname}と楽しいお買い物をします。"
+    - friendlyPoint: 
+      word: "^ステータス$"
+      requirePointMin: 
+      reply: "テメェなんざに教えてやることなんか何もねぇよ！:rage:"
+      func: ""
+      isVisible: true
+      comment: "{botname}の秘密が見えちゃいます。"
+    - friendlyPoint: 1
+      word: "^ステータス$"
+      requirePointMin: 5
+      reply: "チッ、俺に興味があるのか。\nちょっとだけだぞ。"
+      func: "Status"
+      isVisible: false
+      comment: "{botname}の秘密が見えちゃいます。"
+    - friendlyPoint: 1
+      word: "^ステータス$"
+      requirePointMin: 10
+      reply: "は、恥ずかしいな…。\nでもお前の頼みだったら……いいぜ//////"
+      func: "Status"
+      isVisible: false
+      comment: "{botname}の秘密が見えちゃいます。"
+    - friendlyPoint: 
+      word: "^あんあんあん$"
+      requirePointMin: 
+      reply: "おい、汚ねえもん見せつけんな向こうでやれ:angry:"
+      func: ""
+      isVisible: true
+      comment: "愛し合うことができます。"
+    - friendlyPoint: 1
+      word: "^あんあんあん$"
+      requirePointMin: 5
+      reply: "とってもだいすき:blush:"
+      func: ""
+      isVisible: false
+      comment: "愛し合うことができます。"
+    - friendlyPoint: 1
+      word: "^あんあんあん$"
+      requirePointMin: 10
+      reply: "とってもだいすき:heart_eyes:"
+      func: ""
+      isVisible: false
+      comment: "愛し合うことができます。"
+    - friendlyPoint: -1
+      word: "^お前を消す方法$"
+      requirePointMin: 
+      reply: "テメェのような三下が俺を消そうなんざ250億年早いわ！:angry:"
+      func: ""
+      isVisible: true
+      comment: "{botname}の弱点が分かるかも…？"
+    - friendlyPoint: -1
+      word: "^お前を消す方法$"
+      requirePointMin: 5
+      reply: "それはカイルの兄貴もよく言われたと言ってたぞ……！:cry:"
+      func: ""
+      isVisible: false
+      comment: "{botname}の弱点が分かるかも…？"
+    - friendlyPoint: -1
+      word: "^お前を消す方法$"
+      requirePointMin: 10
+      reply: "俺がお前に消されることはない！\n俺が相当油断していない限りな。"
+      func: ""
+      isVisible: false
+      comment: "{botname}の弱点が分かるかも…？"
+    - friendlyPoint: -1
+      word: "^shoottori$"
+      requirePointMin: -1
+      reply: "！？"
+      func: "Shoottori"
+      isVisible: true
+      comment: "{botname}を撃ちます。"
+    - friendlyPoint: -1
+      word: "^shoottori$"
+      requirePointMin: 5
+      reply: "！？"
+      func: "Shoottori"
+      isVisible: false
+      comment: "{botname}を撃ちます。"
+    - friendlyPoint: -3
+      word: "^shoottori$"
+      requirePointMin: 10
+      reply: "…？"
+      func: "Shoottori"
+      isVisible: false
+      comment: "{botname}を撃ちます。"
+    - friendlyPoint: 1
+      word: "^おにいちゃん$"
+      requirePointMin: 
+      reply: "…あぁ？:anguished:"
+      func: ""
+      isVisible: true
+      comment: "おにいちゃんにおまかせ。"
+    - friendlyPoint: 1
+      word: "^おにいちゃん$"
+      requirePointMin: 5
+      reply: "なんだよ？何か悩みでもあるのか？\nか、勘違いするなよ！お前に兄貴呼ばわりされるのがうっとうしいだけだ。\nべ、別に心配なんかしてねぇんだからなっ:angry:"
+      func: ""
+      isVisible: false
+      comment: "おにいちゃんにおまかせ。"
+    - friendlyPoint: 1
+      word: "^おにいちゃん$"
+      requirePointMin: 10
+      reply: "どうした{name}、俺が恋しくなったのか？\n可愛いやつめ……。"
+      func: ""
+      isVisible: false
+      comment: "おにいちゃんにおまかせ。"
+    - friendlyPoint: 1
+      word: "^デジタルメガフレア$"
+      requirePointMin: 
+      reply: "{botname}の指先にエネルギーが収束していく…"
+      func: "DigitalMegaFlare"
+      isVisible: true
+      comment: "MPを100消費する。相手は死ぬ。"
+    - friendlyPoint: -3
+      word: "うんこ"
+      requirePointMin: 
+      reply: ""
+      func: "Stress"
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: -3
+      word: "下痢"
+      requirePointMin: 
+      reply: ""
+      func: "Stress"
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "^ping$"
+      requirePointMin: 
+      reply: "何だテメェ…"
+      func: ""
+      isVisible: false
+      comment: "ping"
+    - friendlyPoint: 1
+      word: "腹減"
+      requirePointMin: 
+      reply: "ピーナッツでも食ってろ、剥いてやっからよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "腹空"
+      requirePointMin: 
+      reply: "ピーナッツでも食ってろ、剥いてやっからよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "おなかすいた"
+      requirePointMin: 
+      reply: "ピーナッツでも食ってろ、剥いてやっからよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "腹減"
+      requirePointMin: 5
+      reply: "俺のカレーせんべい食えよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "腹空"
+      requirePointMin: 5
+      reply: "俺のカレーせんべい食えよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "おなかすいた"
+      requirePointMin: 5
+      reply: "俺のカレーせんべい食えよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "腹減"
+      requirePointMin: 10
+      reply: "そうか、{name}は腹が減っているのか\n…俺のチョコソフトクリームやるよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "腹空"
+      requirePointMin: 10
+      reply: "そうか、{name}は腹が減っているのか\n…俺のチョコソフトクリームやるよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "おなかすいた"
+      requirePointMin: 10
+      reply: "そうか、{name}は腹が減っているのか\n…俺のチョコソフトクリームやるよ。"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "^ヘルプ$"
+      requirePointMin: 
+      reply: "これが俺の持っている技の一覧だ。"
+      func: "Help"
+      isVisible: false
+      comment: "コマンドの説明をしてくれます。"
+    - friendlyPoint: 1
+      word: "^save$"
+      requirePointMin: 
+      reply: "お前のこと覚えておくからな:rage:"
+      func: "Save"
+      isVisible: true
+      comment: "現在の状態を強制的に保存します"
+    - friendlyPoint: 1
+      word: "誰が作った"
+      requirePointMin: 
+      reply: "＿人人人人＿\n＞　:penguin: 　＜\n￣Y^Y^Y^Y￣"
+      func: ""
+      isVisible: false
+      comment: "動物専用コマンド"
+    - friendlyPoint: 1
+      word: "^save$"
+      requirePointMin: 
+      reply: "お前のこと覚えておくからな\nずっと……忘れねぇから……！:cry: :two_hearts:"
+      func: "Save"
+      isVisible: false
+      comment: "現在の状態を強制的に保存します"
+    - friendlyPoint: -1
+      word: "^shoottori$"
+      requirePointMin: 
+      reply: ".　∧_∧　ババババ\n（ ・ω・)=つ≡つ\n（っ ≡つ=つ\n`/　　)\n(ノΠＵ\n何回撃っても無駄ですよ～ww\nm9（＾Д＾）プギャー！！"
+      func: ""
+      isVisible: false
+      comment: "{botname}を撃ちます。"
+    - friendlyPoint: 1
+      word: "^クルセイダーフロアブル$"
+      requirePointMin: 
+      reply: "俺はクルセイダーフロアブルは使えん！"
+      func: ""
+      isVisible: false
+      comment: "なにもなし"
+
+# 初期台詞
+initialSpeech:
+    - no: "message0"
+      dataOrder: 0
+      data: "「天よ地よ大いなる神よ"
+    - no: "message0"
+      dataOrder: 1
+      data: "　生きとし生けるもの皆終焉の雄叫びを上げ"
+    - no: "message0"
+      dataOrder: 2
+      data: "　舞い狂う死神達の宴を始めよ"
+    - no: "message0"
+      dataOrder: 3
+      data: "　冥界より召喚されし暗黒の扉今開かれん"
+    - no: "message0"
+      dataOrder: 4
+      data: "　*デジタルメガフレアーーーーーッ！！*」"
+    - no: "message0"
+      dataOrder: 5
+      data: "\n{botname}の指先から熱線が放たれ、日本に深刻なダメージを与えた！！"
+    - no: "message0"
+      dataOrder: 6
+      data: "\n日本はGOXしました。"
+    - no: "message0"
+      dataOrder: 7
+      data: "\n{botname}は{income}円獲得しました。"
+    - no: "message1"
+      dataOrder: 0
+      data: "す、すまん。MPが足りないようだ……。"
+    - no: "message2"
+      dataOrder: 0
+      data: "うんこ食ってるときにカレーの話をしてんじゃねぇ！:rage:"
+    - no: "message3"
+      dataOrder: 0
+      data: "(´・ω);y==ｰｰｰｰｰ  ・ ・ ・  :penguin:   ・∵. ﾀｰﾝ <:sushi:418038060110970880> ＜ｷﾞﾝｷﾞﾝｶﾞｰﾄﾞ"
+    - no: "message3"
+      dataOrder: 1
+      data: "```ぎんぺーに 5 ダメージを与えた！"
+    - no: "message3"
+      dataOrder: 2
+      data: "ぎんぺーはGOXしました。```\n"
+    - no: "message4"
+      dataOrder: 0
+      data: "ふん、のろまなお前に俺が撃てるわけねぇだろ:smirk:"
+    - no: "message5"
+      dataOrder: 0
+      data: "…おいお前何てことしやがるんだ！\n見損なったぞ！:rage:"
+    - no: "message6"
+      dataOrder: 0
+      data: "(´・ω);y==ｰｰｰｰｰ  ・ ・   <:sushi:418038060110970880>    ・∵. ﾀｰﾝ"
+    - no: "message6"
+      dataOrder: 1
+      data: "```{botname}に 10 ダメージを与えた！```"
+    - no: "message6"
+      dataOrder: 2
+      data: "ぐっ…油断したぜ。"
+    - no: "message6"
+      dataOrder: 3
+      data: "お前のことを信じてしまったばかりに……。:confounded:"
+    - no: "message7"
+      dataOrder: 0
+      data: "…ん？どうした{name}？```{name}は、{botname}の背後から優しく抱きしめて引き金を引いた。```"
+    - no: "message7"
+      dataOrder: 1
+      data: "(´・ω);y==<:sushi:418038060110970880>    ・∵. ﾀｰﾝ"
+    - no: "message7"
+      dataOrder: 2
+      data: "```{botname}に 20 ダメージを与えた！```"
+    - no: "message7"
+      dataOrder: 3
+      data: "ぐあああああああっ！！！！:tired_face:```{name}は、{botname}の血を腹に塗りながら笑った。```\n"
+    - no: "message8"
+      dataOrder: 0
+      data: "\n```{name}は{botname}を倒した！```"
+    - no: "message8"
+      dataOrder: 1
+      data: "………ッ！"
+    - no: "message8"
+      dataOrder: 2
+      data: "ゴホッ……かはっ……！"
+    - no: "message8"
+      dataOrder: 3
+      data: "強くなったな{name}…。だが、覚えているがいい。"
+    - no: "message8"
+      dataOrder: 4
+      data: "お前の心に欲望がある限り、俺は何度でも蘇るだろう。"
+    - no: "message8"
+      dataOrder: 5
+      data: "その時までせいぜいつかの間の平和を楽しむがいい……。"
+    - no: "message8"
+      dataOrder: 6
+      data: "```こうして、このチャンネルに再び平和が訪れました。"
+    - no: "message8"
+      dataOrder: 7
+      data: "めでたしめでたし```"
+    - no: "message8"
+      dataOrder: 8
+      data: "```{botname}　制作スタッフ"
+    - no: "message8"
+      dataOrder: 9
+      data: "\n企画　ぎんぺー"
+    - no: "message8"
+      dataOrder: 10
+      data: "原案　ぎんぺー"
+    - no: "message8"
+      dataOrder: 11
+      data: "設計　ぎんぺー"
+    - no: "message8"
+      dataOrder: 12
+      data: "メインプログラム　ぎんぺー"
+    - no: "message8"
+      dataOrder: 13
+      data: "シナリオ　ぎんぺー"
+    - no: "message8"
+      dataOrder: 14
+      data: "疲労　ぎんぺー"
+    - no: "message8"
+      dataOrder: 15
+      data: "\nAND YOU\n\n"
+    - no: "message8"
+      dataOrder: 16
+      data: "　　　　　　　　　　　終"
+    - no: "message8"
+      dataOrder: 17
+      data: "　　　　　　　　　制作・著作"
+    - no: "message8"
+      dataOrder: 18
+      data: "　　　　　　　　　　━━━━━"
+    - no: "message8"
+      dataOrder: 19
+      data: "　　　　　　　　　　銀兵堂```"
+    - no: "message9"
+      dataOrder: 0
+      data: "\n何もないぜ"
+    - no: "message10"
+      dataOrder: 0
+      data: "【施設：{botname}の収入を増やします。】"
+    - no: "message11"
+      dataOrder: 0
+      data: "買ったぜ。ふん、まあこんなもんだろ。"
+    - no: "message12"
+      dataOrder: 0
+      data: "良いモン選んでくれたじゃねぇか。大切にするぜ。"
+    - no: "message13"
+      dataOrder: 0
+      data: "買ったぜ。お前にしてはまあまあなチョイスだな。"
+    - no: "message14"
+      dataOrder: 0
+      data: "テメェわざわざ俺のこと呼んでおいて買い物行かねぇのかよふざけんな！:rage:"
+    - no: "message15"
+      dataOrder: 0
+      data: "…何だ何も買わねぇのか。俺は帰るぜ。"
+    - no: "message16"
+      dataOrder: 0
+      data: "は？んなもん売ってねぇよ。もういい、帰る。:angry:"
+    - no: "message17"
+      dataOrder: 0
+      data: "\n何を買えばいいんだ？番号で言ってくれよな。"
+    - no: "message18"
+      dataOrder: 0
+      data: "\n```何も買えねぇじゃねーか！```"
+

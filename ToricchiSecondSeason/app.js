@@ -16,6 +16,9 @@ const ToricchiHelper_1 = require("./ToricchiHelper");
 const DbStore_1 = require("./DbStore");
 const Shop_1 = require("./Shop");
 const Parameter_1 = require("./models/Parameter");
+const Speech_1 = require("./models/Speech");
+const Facility_1 = require("./models/Facility");
+const ReplyMessage_1 = require("./models/ReplyMessage");
 'use strict';
 // 設定ファイル
 var config = require('config');
@@ -26,87 +29,48 @@ const client = new Discord.Client();
 client.login(token).then(() => {
     console.log(config.messages.discordConnect);
 });
-// discordクライアントにエラーが発生した場合
-// 一旦強制的に切断して、再接続を試みます。
-var reconnecting = 0; // 接続中
-client.on('error', (error) => __awaiter(this, void 0, void 0, function* () {
-    if (reconnecting == 0) {
-        reconnecting = 1; // 切断中
-        showError(error);
-        // 強制切断
-        console.log(config.messages.destroy);
-        client.destroy().then((value) => __awaiter(this, void 0, void 0, function* () {
-            console.log(config.messages.destroyEnd);
-            yield reconnect(10);
-        }));
-    }
-}));
-/**
- * 繋がるまで再接続を試みます
- * @param seconds 待ち時間（秒）
- */
-function reconnect(seconds) {
-    return __awaiter(this, void 0, void 0, function* () {
-        while (reconnecting == 1) {
-            // 数秒待つ
-            console.log(seconds + config.messages.reconnectWait);
-            yield sleep(seconds * 1000);
-            // 再接続
-            console.log(config.messages.reconnect);
-            yield client.login(token).then(() => {
-                // 何故かここに来ない。ライブラリの不具合？
-                console.log(config.messages.reconnectEnd);
-                reconnecting = 0;
-            }).catch((error) => {
-                showError(error);
-            });
-        }
-    });
-}
 // 初期化処理
 client.on('ready', () => __awaiter(this, void 0, void 0, function* () {
     // データベースのデータをキャッシュする
-    console.log(MessageConstants_1.cacheMessage);
+    console.log(config.messages.cacheMessage);
     yield DbStore_1.initialize();
     // 初期状態チェック
-    if (DbStore_1.cache["parameter"].length == 0) {
-        // 設定ファイルに基づいて初期化する
-        console.log(MessageConstants_1.initialMessage);
+    // 各テーブルを設定ファイルに基づいて初期化する
+    if (DbStore_1.cache[MessageConstants_1.parameterTable].length === 0) {
+        // パラメータ初期化
+        console.log(config.messages.initialzeParameter);
         config.initialParameter.forEach((value) => {
             makeParameter(value.name, value.value, value.visibleLevel, value.display);
         });
         DbStore_1.saveAll();
     }
-    // 完了メッセージ
-    console.log(MessageConstants_1.startupMessage);
-}));
-/**
- * とりっちの名前変更
- * @param newname
- */
-function setBotName(newname) {
-    console.log(config.messages.changeName + newname);
-    if (id) {
-        client.fetchUser(id).then((value) => {
-            value.setUsername(newname);
-            var name = ToricchiHelper_1.getParameter("Name");
-            name.value = newname;
-            value.lastMessage.member.setNickname(newname).catch((error) => {
-                showError(error);
-            });
+    if (DbStore_1.cache[MessageConstants_1.facilityTable].length === 0) {
+        // 施設データ初期化
+        console.log(config.messages.initialzeFacility);
+        config.initialFacility.forEach((value) => {
+            makeFacility(value.name, value.basePrice, value.baseIncome, value.comment);
         });
+        DbStore_1.saveAll();
     }
-}
-exports.setBotName = setBotName;
-// パラメータを追加する
-function makeParameter(name, value, visibleLevel, display) {
-    var parameter = new Parameter_1.default();
-    parameter.value = value;
-    parameter.name = name;
-    parameter.visibleLevel = visibleLevel;
-    parameter.display = display;
-    DbStore_1.cache["parameter"].push(parameter);
-}
+    if (DbStore_1.cache[MessageConstants_1.replyMessageTable].length === 0) {
+        // 会話データ初期化
+        console.log(config.messages.initialzeReply);
+        config.initialReplyMessage.forEach((value) => {
+            makeReplyMessage(value.friendlyPoint, value.word, value.requirePointMin, value.reply, value.func, value.isVisible, ToricchiHelper_1.correctMessage(value.comment));
+        });
+        DbStore_1.saveAll();
+    }
+    if (DbStore_1.cache[MessageConstants_1.speechTable].length === 0) {
+        // 台詞データ初期化
+        console.log(config.messages.initialzeSpeech);
+        config.initialSpeech.forEach((value) => {
+            makeSpeech(value.no, value.dataOrder, value.data);
+        });
+        DbStore_1.saveAll();
+    }
+    // 完了メッセージ
+    console.log(config.messages.startupMessage);
+}));
 // 前回の時刻
 var preHour = 0;
 // とりっちのID
@@ -129,7 +93,7 @@ client.on('message', message => {
                         makeParameter(config.botId.name, message.author.id, config.botId.visibleLevel, config.botId.display);
                         id = message.author.id;
                         // 既定の名前になっている場合、とりっちモードにし、死亡イベントで名前が変更される
-                        if (name.value === MessageConstants_1.defaultBotName1 + MessageConstants_1.defaultBotName2 + MessageConstants_1.defaultBotName3) {
+                        if (name.value === config.defaultName.head + config.defaultName.body + config.defaultName.foot) {
                             makeParameter(config.toricchiMode.name, config.toricchiMode.value, config.toricchiMode.visibleLevel, config.toricchiMode.display);
                         }
                     }
@@ -197,6 +161,43 @@ client.on('message', message => {
         showError(error);
     }
 });
+// discordクライアントにエラーが発生した場合
+// 一旦強制的に切断して、再接続を試みます。
+var reconnecting = 0; // 接続中
+client.on('error', (error) => __awaiter(this, void 0, void 0, function* () {
+    if (reconnecting == 0) {
+        reconnecting = 1; // 切断中
+        showError(error);
+        // 強制切断
+        console.log(config.messages.destroy);
+        client.destroy().then((value) => __awaiter(this, void 0, void 0, function* () {
+            console.log(config.messages.destroyEnd);
+            yield reconnect(10);
+        }));
+    }
+}));
+/**
+ * 繋がるまで再接続を試みます
+ * @param seconds 待ち時間（秒）
+ */
+function reconnect(seconds) {
+    return __awaiter(this, void 0, void 0, function* () {
+        while (reconnecting == 1) {
+            // 数秒待つ
+            console.log(seconds + config.messages.reconnectWait);
+            yield sleep(seconds * 1000);
+            // 再接続
+            console.log(config.messages.reconnect);
+            yield client.login(token).then(() => {
+                // 何故かここに来ない。ライブラリの不具合？
+                console.log(config.messages.reconnectEnd);
+                reconnecting = 0;
+            }).catch((error) => {
+                showError(error);
+            });
+        }
+    });
+}
 /**
  * メッセージ候補を降順で取得する
  * @param messageContent メッセージ本文
@@ -206,7 +207,7 @@ function getCandidateList(messageContent) {
     var candidateList = [];
     // メッセージ一覧を取得
     // 条件に合ったメッセージを集める
-    DbStore_1.cache["replyMessage"].forEach((value) => {
+    DbStore_1.cache[MessageConstants_1.replyMessageTable].forEach((value) => {
         if (messageContent.match(new RegExp(value.word, 'g'))) {
             candidateList.push(value);
         }
@@ -226,6 +227,73 @@ function getCandidateList(messageContent) {
         return 0;
     });
     return candidateList;
+}
+/**
+ * とりっちの名前変更
+ * @param newname
+ */
+function setBotName(newname) {
+    console.log(config.messages.changeName + newname);
+    if (id) {
+        client.fetchUser(id).then((value) => {
+            value.setUsername(newname);
+            var name = ToricchiHelper_1.getParameter("Name");
+            name.value = newname;
+            value.lastMessage.member.setNickname(newname).catch((error) => {
+                showError(error);
+            });
+        });
+    }
+}
+exports.setBotName = setBotName;
+// パラメータを追加する
+function makeParameter(name, value, visibleLevel, display) {
+    var temp = new Parameter_1.default();
+    temp.value = value;
+    temp.name = name;
+    temp.visibleLevel = visibleLevel;
+    temp.display = display;
+    DbStore_1.cache[MessageConstants_1.parameterTable].push(temp);
+}
+// 施設を追加する
+function makeFacility(name, basePrice, baseIncome, comment) {
+    var temp = new Facility_1.default();
+    temp.name = name;
+    temp.basePrice = basePrice;
+    temp.baseIncome = baseIncome;
+    temp.level = 0;
+    temp.currentPrice = basePrice;
+    temp.currentIncome = baseIncome;
+    temp.comment = comment;
+    DbStore_1.cache[MessageConstants_1.parameterTable].push(temp);
+}
+// 応答メッセージを追加する
+function makeReplyMessage(friendlyPoint, word, requirePointMin, reply, func, isVisible, comment) {
+    var temp = new ReplyMessage_1.default();
+    if (friendlyPoint) {
+        temp.friendlyPoint = friendlyPoint;
+    }
+    temp.word = word;
+    if (requirePointMin) {
+        temp.requirePointMin = requirePointMin;
+    }
+    temp.reply = reply;
+    if (func) {
+        temp.function = func;
+    }
+    temp.isVisible = isVisible;
+    if (comment) {
+        temp.comment = comment;
+    }
+    DbStore_1.cache[MessageConstants_1.parameterTable].push(temp);
+}
+// 台詞を追加する
+function makeSpeech(no, dataOrder, data) {
+    var temp = new Speech_1.default();
+    temp.no = no;
+    temp.dataOrder = dataOrder;
+    temp.data = data;
+    DbStore_1.cache[MessageConstants_1.parameterTable].push(temp);
 }
 /**
  * 待機する
