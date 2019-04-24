@@ -33,7 +33,7 @@ app.tsがあるディレクトリまで移動して以下を実行する。
 
 #### ■webpackを使う方法（推奨）
 webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。  
-```npm run build```
+```npm run build```  
 distにjsファイルが出力されるので、これを実行環境にコピー。  
 configフォルダもjsと同ディレクトリにコピー。  
   
