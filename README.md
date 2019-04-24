@@ -2,75 +2,46 @@
 DiscordBOT製作第二期、TypeScript製、MariaDBを使用。
 ![ToricchiSecondSeason](https://user-images.githubusercontent.com/39305262/54169110-c287ea00-44b4-11e9-80db-ceb1c9bde233.png "ToricchiSecondSeason")
 ## はじめに
-Discordのチャットで特定の文字に対して反応するだけのBOTです。  
-特に役立つ機能はありません。  
-殆ど自分の勉強用プロジェクトなので、一般利用者が動作させるには色々と不十分です。
+Discordのチャットで特定の文字に対して反応し、メッセージを返すだけのBOTです。
+特に役立つ機能はありません。
+殆ど自分の勉強用プロジェクトです。
+作った反省点としては、型は分かる限りは書かないとIDEが活かせないことだと思います。
 ### 前提条件
-javascript(node.js)が動作する環境ならば動かせるはず。  
-Discord用BOTなので、[Discord開発者用ページ](https://discordapp.com/developers/applications/) でトークンを作成しておく必要あり。
+javascript(node.js)が動作する環境ならば動作します。
+別途、MariaDBを準備する必要があります。
+Discord用BOTなので、[Discord開発者用ページ](https://discordapp.com/developers/applications/) でトークンを作成しておく必要があります。
 
 ### インストール方法
-インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。  
-app.ts(app.js)をエントリーポイントに起動すれば動作する。  
-ビルドする前に、app.ts内の以下の部分にDiscord開発者用ページで作成したトークンを書く。
-```
-// 設定項目
-//const token = '<DiscordBOTのトークン>';
-```
-DbStore.tsのデータベースの設定部分を環境に合わせて変更する。  
-```
-// データベースの設定
-public static connectionOptions: ConnectionOptions = {
-    // 設定を書くこと
-    // 詳しくはここ！
-    // https://typeorm.io/
-    type: "mysql",
-    database: "toricchi",
-    host: "localhost",    // DBと同じサーバにリリースする時は、localhostにする
-    port: 3306,
-    username: "onak",
-    password: "password",
-    logging: false,
-    entities: [
-        Character,
-        Facility,
-        Parameter,
-        ReplyMessage
-    ],
-    // Model変更をデータベースのテーブル定義に反映する
-    synchronize: true
-};
-```
+インストールファイルは用意していないので、ローカルにリポジトリをコピーしてビルドする手順が必要。
+app.ts(app.js)をエントリーポイントに起動すれば動作する。
+ビルドする前に、```config/default.yaml```内の以下の部分にDiscord開発者用ページで作成したトークンを書く。
+同ファイルのデータベースの設定部分を環境に合わせて変更する。
 
-■nexeを使う場合
+####■nexeを使う場合
 PowreShell等を使って、nexeをグローバルでインストールする。
-```
-npm i -g nexe@next
-```
+```npm i -g nexe@next```
 ビルドして、nexeでパッケージングする。  
 app.tsがあるディレクトリまで移動して以下を実行する。
-```
-nexe app.js
-```
+```nexe app.js```
 ※app.tsだとexe起動できない。
 
-この3つを任意のディレクトリに移動する。
+この2つを任意のディレクトリに移動する。
 * app.exe
-* dataフォルダ
-* node_modulesフォルダ
-  
-■webpackを使う方法（推奨）  
+* configフォルダ
+**動作しない場合、node_modulesフォルダが必要かもしれない（未確認）**
+
+####■webpackを使う方法（推奨）
 webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。
-```
-npm run build
-```
-distにjsファイルが出力されるので、これを実行環境にコピー。  
+```npm run build```
+distにjsファイルが出力されるので、これを実行環境にコピー。
 node_modulesフォルダもjsと同ディレクトリにコピー。  
   
-または、node_modulesをコピーせずに以下の3つを実行環境でnpmインストールする。  
+または、node_modulesをコピーせずに以下の5つを実行環境でnpmインストールする。  
 * discord.js
 * mysql
 * typeorm
+* node-config
+* config
 
 ### 使用方法
 exe実行したらプロンプト画面が出てくるので、そのままにしておく。  
