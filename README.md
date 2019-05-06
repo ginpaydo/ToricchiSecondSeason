@@ -34,18 +34,18 @@ app.tsがあるディレクトリまで移動して以下を実行する。
 #### ■webpackを使う方法（推奨）
 webpack.config.jsが同梱されているので、以下のコマンドでwebpackビルドできる。  
 ```npm run build```  
-distにjsファイルが出力されるので、これを実行環境にコピー。  
-configフォルダもjsと同ディレクトリにコピー。  
-  
-以下の5つを実行環境でnpmインストールする。  
-* discord.js
-* mysql
-* typeorm
-* node-config
-* config
+
+以下を実行環境にコピーする。
+* distに出力されたmain.js
+* configフォルダ
+* package.json
+
+コピーしたディレクトリで以下のコマンドを実行する。
+```npm install```
 
 ### 使用方法
-exe実行したらプロンプト画面が出てくるので、そのままにしておく。  
+main.jsをコピーしたディレクトリで以下のコマンドを入力することで実行できます。
+```node main.js```
 DiscordにBOTを追加する。
 （https://discordapp.com/oauth2/authorize?client_id=<Discord開発者用ページで取得したクライアントID>&scope=bot&permissions=0）
 
