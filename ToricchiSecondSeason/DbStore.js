@@ -22,10 +22,14 @@ const Speech_1 = require("./models/Speech");
 const SpeechController_1 = require("./controllers/SpeechController");
 // 設定ファイル
 var config = require('config');
+console.log("あんあん");
+console.log(config.database.type);
 class DbStore {
     // 接続（シングルトン）
     static createConnection() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log("いんいん");
+            console.log(config.database.type);
             if (!this._conn) {
                 this._conn = yield typeorm_1.createConnection(this.connectionOptions);
             }

@@ -1,5 +1,5 @@
 ﻿# DiscordBOTのトークン
-token: "<DiscordBOTのトークン>"
+token: "NDE3ODkyMzU0NDgyMjQxNTQ2.D3EHeg.MioXMNeS46DFWtbR0vTiYftgy0M"
 
 # クライアントエラーで再接続するときの待機秒数
 reconnectSeconds: 300
@@ -12,8 +12,8 @@ database:
     host: "192.168.0.9"
 #    host: localhost
     port: 3306
-    username: "onak"
-    password: "pass"
+    username: "ginpay"
+    password: "password"
     logging: false
     synchronize: true
 
