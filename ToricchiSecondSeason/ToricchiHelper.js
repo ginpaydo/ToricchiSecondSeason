@@ -59,7 +59,7 @@ function updateToricchi() {
     updateParameter("Money", income);
     // 戦闘不能ならばHP回復
     var isDead = getParameterNumber("IsDead");
-    if (isDead) {
+    if (isDead == 1) {
         var temp = updateParameterMax("Hp", "MaxHp", 1);
         console.log("現在HP:" + temp.value);
         // 最大値になっていたら復活
@@ -113,11 +113,14 @@ exports.correctMessage = correctMessage;
  * @returns 処理後のパラメータ
  */
 function updateParameterMax(name, maxName, addValue) {
+    var tempmax = getParameter(maxName);
+    console.log("zzzz");
     if (tempmax) {
-        var tempmax = getParameter(maxName);
+        console.log("aaaa");
         var maxValue = Number(tempmax.value);
         return updateParameter(name, addValue, maxValue);
     }
+    console.log("cccc");
     return tempmax;
 }
 exports.updateParameterMax = updateParameterMax;
@@ -128,7 +131,9 @@ exports.updateParameterMax = updateParameterMax;
  */
 function getParameter(name) {
     // 探す
+    console.log("dddd");
     var result = DbStore_1.cache[MessageConstants_1.parameterTable].find(item => item.name === name);
+    console.log("eeee");
     return result;
 }
 exports.getParameter = getParameter;

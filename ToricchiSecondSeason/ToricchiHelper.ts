@@ -61,7 +61,7 @@ export function updateToricchi() {
     updateParameter("Money", income);
     // 戦闘不能ならばHP回復
     var isDead = getParameterNumber("IsDead");
-    if (isDead) {
+    if (isDead == 1) {
         var temp = updateParameterMax("Hp", "MaxHp", 1);
         console.log("現在HP:" + temp.value);
         // 最大値になっていたら復活
@@ -114,8 +114,8 @@ export function correctMessage(mes): string {
  * @returns 処理後のパラメータ
  */
 export function updateParameterMax(name, maxName, addValue): Parameter {
+    var tempmax = getParameter(maxName);
     if (tempmax) {
-        var tempmax = getParameter(maxName);
         var maxValue = Number(tempmax.value);
         return updateParameter(name, addValue, maxValue);
     }
